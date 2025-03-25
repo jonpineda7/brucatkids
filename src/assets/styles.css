@@ -1,0 +1,36 @@
+body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    background-color: #f0f8ff;
+}
+
+.character-selection {
+    padding: 20px;
+}
+
+.character-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.character-card {
+    cursor: pointer;
+    border: 2px solid #000;
+    padding: 10px;
+    border-radius: 10px;
+    background: white;
+}
+
+.character-card img {
+    width: 100px;
+    height: auto;
+}
+
+.game {
+    padding: 20px;
+}
+
+.game-character {
+    width: 150px;
+}
