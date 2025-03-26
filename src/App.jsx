@@ -29,6 +29,18 @@ function App() {
     setSelectedGame(selectedGame);
   };
 
+  const handleBack = () => {
+    if (selectedGame) {
+      setSelectedGame(null);
+    } else if (category) {
+      setCategory(null);
+    } else if (course) {
+      setCourse(null);
+    } else if (character) {
+      setCharacter(null);
+    }
+  };
+
   return (
     <div id="app">
       {character === null ? (
@@ -51,6 +63,10 @@ function App() {
             <GamesList category={category} onSelectGame={handleGameSelect} />
           ) : (
             <GameView game={selectedGame} lives={lives} />
+          )}
+
+          {character && (course || category || selectedGame) && (
+            <button onClick={handleBack} className="back-button">Volver</button>
           )}
         </>
       )}

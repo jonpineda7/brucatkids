@@ -16,7 +16,7 @@ function GameView({ game, lives }) {
       <p>Vidas restantes: {remainingLives}</p>
       <div className="lives">
         {Array.from({ length: remainingLives }).map((_, index) => (
-          <img key={index} src="/brucatkids/images/heart.png" alt="Heart" />
+          <img key={index} src="/brucatkids/images/heart_full.png" alt="Heart" />
         ))}
       </div>
       {remainingLives <= 0 ? (

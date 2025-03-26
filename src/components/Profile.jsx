@@ -7,7 +7,6 @@ function Profile({ character, score, lives }) {
     <div className="profile">
       <img src={characterImage} alt={character} className={`character ${score >= 50 ? 'character-glow active' : ''}`} />
       <p>Puntaje: {score}</p>
-      <p>Vidas restantes: {lives}</p>
     </div>
   );
 }

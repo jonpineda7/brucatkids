@@ -1,5 +1,5 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Baloo 2', sans-serif; /* Nueva fuente amigable */
     background: linear-gradient(to right, #ff9a9e, #fad0c4, #fad0c4, #ffdde1); /* Gradiente de colores */
     background-attachment: fixed;
     margin: 0;
@@ -17,22 +17,36 @@ body {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   }
   
+  /* Mejorar botones */
   button {
-    background-color: #ff5722;
+    background: linear-gradient(45deg, #ff9800, #ff5722);
     color: white;
-    padding: 12px 25px;
-    border: none;
-    font-size: 1.2rem;
+    padding: 15px 35px;
+    font-size: 1.5rem;
     font-weight: bold;
+    border: none;
+    border-radius: 30px;
     cursor: pointer;
-    border-radius: 25px;
     transition: all 0.3s ease-in-out;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.3);
+    margin: 20px;
   }
   
   button:hover {
-    background-color: #e64a19;
-    transform: scale(1.1);
+    background: linear-gradient(45deg, #ff5722, #d84315);
+    transform: scale(1.15);
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Estilo especial para botón de volver */
+  .back-button {
+    background: linear-gradient(45deg, #03a9f4, #0288d1);
+    font-size: 1.3rem;
+    padding: 12px 30px;
+  }
+  
+  .back-button:hover {
+    background: linear-gradient(45deg, #0288d1, #01579b);
   }
   
   /* Estilos para los personajes */
@@ -52,15 +66,22 @@ body {
   .profile {
     background-color: #fff;
     padding: 10px;
-    margin: 20px auto;
+    margin: 10px auto; /* Reducir el margen para acercar el texto */
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   
   .profile img {
-    width: 150px;
-    height: 150px;
+    width: 120px; /* Reducir el tamaño del personaje */
+    height: 120px; /* Reducir el tamaño del personaje */
     border-radius: 50%;
-    margin-bottom: 10px;
+    margin-bottom: 5px; /* Reducir el espacio entre el personaje y el texto */
+  }
+  
+  .profile p {
+    margin: 5px 0; /* Reducir el espacio entre los textos */
   }
   
   /* Efectos visuales para premios */
@@ -105,30 +126,30 @@ body {
       transform: translate(-50%, -50%) scale(1);
     }
   }
-
+  
+  /* Mejora de textos */
   h1 {
+    font-size: 3.5rem;
     color: #ff4081;
-    font-size: 3rem;
-    animation: fadeIn 1.5s ease-in-out;
-}
-
-p {
-    font-size: 1.2rem;
-    color: #ff5722;
-    margin-bottom: 30px;
-}
-
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  p {
+    font-size: 1.4rem;
+    color: #d84315;
+  }
+  
   @keyframes fadeIn {
     from {
-        opacity: 0;
-        transform: translateY(-20px);
+      opacity: 0;
+      transform: translateY(-20px);
     }
     to {
-        opacity: 1;
-        transform: translateY(0);
+      opacity: 1;
+      transform: translateY(0);
     }
-}
-
+  }
+  
   .character-glow {
     transition: all 0.3s ease;
   }
@@ -136,7 +157,7 @@ p {
   .character-glow.active {
     filter: drop-shadow(0 0 10px #ffeb3b); /* Brillo dorado */
   }
-
+  
   .heart-icon {
     width: 30px;
     height: 30px;
@@ -146,4 +167,57 @@ p {
   
   .heart-icon:hover {
     transform: scale(1.2);
+  }
+  
+  /* Ajuste del contenedor de la lista de juegos */
+  .games-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Espacio entre botones */
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+  
+  .game-item {
+    flex: 1 1 calc(33.33% - 40px);
+    max-width: 220px; /* Ajustado para evitar desbordes */
+    text-align: center;
+    padding: 12px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 0.9rem; /* Tamaño de fuente reducido */
+    font-weight: bold;
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Agrega "..." si el texto es demasiado largo */
+  }
+  
+  .game-item button {
+    font-size: 0.9rem; /* Reducido el tamaño de los botones */
+  }
+  
+  .game-item:hover {
+    transform: scale(1.1);
+  }
+
+  .heart-icon {
+    width: 20px; /* Tamaño reducido */
+    height: 20px; /* Tamaño reducido */
+    margin: 0 5px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .heart-icon:hover {
+    transform: scale(1.2);
+  }
+
+  .lives img {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px; /* Separación entre los corazones */
   }

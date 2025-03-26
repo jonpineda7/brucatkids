@@ -1,4 +1,3 @@
-// src/components/GamesList.jsx
 import React from 'react';
 
 function GamesList({ category, onSelectGame }) {
@@ -11,9 +10,9 @@ function GamesList({ category, onSelectGame }) {
   return (
     <div>
       <h2>Juegos de {category}</h2>
-      <ul>
+      <ul className="games-list">
         {games[category].map((game, index) => (
-          <li key={index}>
+          <li key={index} className="game-item">
             <button onClick={() => onSelectGame(game)}>{game}</button>
           </li>
         ))}
