@@ -1,28 +1,26 @@
 body {
-    font-family: 'Baloo 2', sans-serif; /* Nueva fuente amigable */
-    background: linear-gradient(to right, #ff9a9e, #fad0c4, #fad0c4, #ffdde1); /* Gradiente de colores */
+    font-family: 'Baloo 2', sans-serif;
+    background: linear-gradient(to right, #ff9a9e, #fad0c4, #fad0c4, #ffdde1);
     background-attachment: fixed;
     margin: 0;
     padding: 0;
     text-align: center;
   }
   
-  /* Contenedor principal */
   #app {
     max-width: 900px;
     margin: auto;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   }
   
-  /* Mejorar botones */
   button {
     background: linear-gradient(45deg, #ff9800, #ff5722);
     color: white;
     padding: 15px 35px;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: bold;
     border: none;
     border-radius: 30px;
@@ -36,9 +34,9 @@ body {
     background: linear-gradient(45deg, #ff5722, #d84315);
     transform: scale(1.15);
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
+    font-size: 1.2rem;
   }
   
-  /* Estilo especial para botón de volver */
   .back-button {
     background: linear-gradient(45deg, #03a9f4, #0288d1);
     font-size: 1.3rem;
@@ -49,7 +47,6 @@ body {
     background: linear-gradient(45deg, #0288d1, #01579b);
   }
   
-  /* Estilos para los personajes */
   .characters img {
     width: 120px;
     height: 120px;
@@ -62,11 +59,10 @@ body {
     transform: scale(1.2);
   }
   
-  /* Estilos para el perfil y el puntaje */
   .profile {
     background-color: #fff;
     padding: 10px;
-    margin: 10px auto; /* Reducir el margen para acercar el texto */
+    margin: 10px auto;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -74,17 +70,16 @@ body {
   }
   
   .profile img {
-    width: 120px; /* Reducir el tamaño del personaje */
-    height: 120px; /* Reducir el tamaño del personaje */
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    margin-bottom: 5px; /* Reducir el espacio entre el personaje y el texto */
+    margin-bottom: 5px;
   }
   
   .profile p {
-    margin: 5px 0; /* Reducir el espacio entre los textos */
+    margin: 5px 0;
   }
   
-  /* Efectos visuales para premios */
   .reward {
     background-color: #ffeb3b;
     padding: 15px;
@@ -98,7 +93,6 @@ body {
     transform: scale(1.1);
   }
   
-  /* Efectos visuales para "Modo Súper Niño" */
   .super-kid-effects {
     position: absolute;
     top: 50%;
@@ -127,11 +121,11 @@ body {
     }
   }
   
-  /* Mejora de textos */
   h1 {
     font-size: 3.5rem;
     color: #ff4081;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-out;
   }
   
   p {
@@ -155,7 +149,7 @@ body {
   }
   
   .character-glow.active {
-    filter: drop-shadow(0 0 10px #ffeb3b); /* Brillo dorado */
+    filter: drop-shadow(0 0 10px #ffeb3b);
   }
   
   .heart-icon {
@@ -169,55 +163,62 @@ body {
     transform: scale(1.2);
   }
   
-  /* Ajuste del contenedor de la lista de juegos */
-  .games-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px; /* Espacio entre botones */
-    list-style: none;
-    padding: 0;
+  .game-container {
+    background: #fce4ec;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
   }
   
-  .game-item {
-    flex: 1 1 calc(33.33% - 40px);
-    max-width: 220px; /* Ajustado para evitar desbordes */
-    text-align: center;
-    padding: 12px;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    font-size: 0.9rem; /* Tamaño de fuente reducido */
+  .score {
+    font-size: 2rem;
+    color: #ff4081;
     font-weight: bold;
-    transition: transform 0.3s ease-in-out;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis; /* Agrega "..." si el texto es demasiado largo */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   }
   
-  .game-item button {
-    font-size: 0.9rem; /* Reducido el tamaño de los botones */
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
-  .game-item:hover {
-    transform: scale(1.1);
-  }
-
-  .heart-icon {
-    width: 20px; /* Tamaño reducido */
-    height: 20px; /* Tamaño reducido */
-    margin: 0 5px;
-    transition: transform 0.3s ease-in-out;
+  li {
+    margin: 10px;
+    display: flex;
+    justify-content: center;
   }
   
-  .heart-icon:hover {
-    transform: scale(1.2);
-  }
-
   .lives img {
     width: 20px;
     height: 20px;
-    margin-right: 5px; /* Separación entre los corazones */
+    margin-right: 5px;
+  }
+  
+  button {
+    background: linear-gradient(135deg, #ff4081, #ff80ab);
+    color: white;
+    font-size: 1.4rem;
+    padding: 15px 30px;
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.3s ease, background 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  button:hover {
+    background: linear-gradient(135deg, #ff80ab, #ff4081);
+    transform: scale(1.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .heart-icon.lost {
+    opacity: 0.3;
+    transform: scale(1.2);
   }

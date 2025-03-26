@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import CharacterSelection from './components/CharacterSelection';
 import CategorySelection from './components/CategorySelection';
 import GamesList from './components/GamesList';
-import GameView from './components/GameView';
 import Profile from './components/Profile';
+import GameSumas from './components/GameSumas'; // Asegúrate de que la ruta sea correcta
 
 function App() {
   const [character, setCharacter] = useState(null);
@@ -25,8 +25,18 @@ function App() {
     setCategory(selectedCategory);
   };
 
-  const handleGameSelect = (selectedGame) => {
-    setSelectedGame(selectedGame);
+  const handleGameSelect = (game) => {
+    if (game === 'Suma') {
+      setSelectedGame(
+        <GameSumas 
+          lives={lives} 
+          setLives={setLives} 
+          score={score} 
+          setScore={setScore} 
+        />
+      );
+    }
+    // Otros juegos...
   };
 
   const handleBack = () => {
@@ -51,18 +61,19 @@ function App() {
         </div>
       ) : (
         <>
-          <Profile character={character} score={score} lives={lives} />
+          <Profile character={character} />
           {course === null ? (
             <div>
               <button onClick={() => handleCourseSelect('KINDER')}>KINDER</button>
               <button onClick={() => handleCourseSelect('Primero Básico')}>Primero Básico</button>
+              <button onClick={() => handleCourseSelect('Tercero Básico')}>Tercero Básico</button>
             </div>
           ) : category === null ? (
             <CategorySelection course={course} onSelectCategory={handleCategorySelect} />
           ) : selectedGame === null ? (
-            <GamesList category={category} onSelectGame={handleGameSelect} />
+            <GamesList category={category} course={course} onSelectGame={handleGameSelect} />
           ) : (
-            <GameView game={selectedGame} lives={lives} />
+            <div>{selectedGame}</div>
           )}
 
           {character && (course || category || selectedGame) && (
