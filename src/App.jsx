@@ -3,7 +3,9 @@ import CharacterSelection from './components/CharacterSelection';
 import CategorySelection from './components/CategorySelection';
 import GamesList from './components/GamesList';
 import Profile from './components/Profile';
-import GameSumas from './components/GameSumas'; // Asegúrate de que la ruta sea correcta
+import GameSumas from './components/GameSumas';
+import GameRestas from './components/GameRestas';
+import GameMultiplicacion from './components/GameMultiplicacion';
 
 function App() {
   const [character, setCharacter] = useState(null);
@@ -28,12 +30,18 @@ function App() {
   const handleGameSelect = (game) => {
     if (game === 'Suma') {
       setSelectedGame(
-        <GameSumas 
-          onGameOver={handleBack}  // Reutilizamos handleBack para volver al home
-        />
+        <GameSumas onGameOver={handleBack} />
+      );
+    } else if (game === 'Resta') {
+      setSelectedGame(
+        <GameRestas onGameOver={handleBack} />
+      );
+    } else if (game === 'Multiplicación') {
+      setSelectedGame(
+        <GameMultiplicacion onGameOver={handleBack} />
       );
     }
-    // Otros juegos...
+    // Puedes agregar otros juegos aquí...
   };
 
   const handleBack = () => {
