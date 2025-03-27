@@ -7,7 +7,7 @@ const GameOverModal = ({ onGameOver }) => (
   <div className="modal-overlay">
     <div className="modal-content">
       <h2>¡Game Over! ¡Bien Hecho!</h2>
-      <p>No te rindas, sigue practicando la suma.</p>
+      <p>No te rindas, sigue practicando la división.</p>
       <button onClick={onGameOver} className="modal-btn">
         Volver al inicio
       </button>
@@ -15,11 +15,11 @@ const GameOverModal = ({ onGameOver }) => (
   </div>
 );
 
-const GameSumas = ({ onGameOver }) => {
-  // Estado para controlar la etapa: "learning" o "challenge"
+const GameDivision = ({ onGameOver }) => {
+  // Etapa: "learning" o "challenge"
   const [stage, setStage] = useState("learning");
-  // Estado para el número base seleccionado para practicar la suma
-  const [selectedBase, setSelectedBase] = useState(null);
+  // Estado para el divisor seleccionado (para aprender a dividir)
+  const [selectedDivisor, setSelectedDivisor] = useState(null);
 
   // Estados para la etapa de desafío ("challenge")
   const [lives, setLives] = useState(initialLives);
@@ -30,16 +30,17 @@ const GameSumas = ({ onGameOver }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [gameOver, setGameOver] = useState(false);
 
-  // Sonidos para feedback (asegúrate de que las rutas sean correctas)
+  // Sonidos para feedback (verifica que las rutas sean correctas)
   const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3");
   const correctSound = new Audio("/brucatkids/sounds/correct.mp3");
 
-  // Genera una pregunta para la etapa de desafío basada en el número base
+  // En la etapa de challenge, se genera una pregunta de división.
+  // Para evitar fracciones, se genera un cociente aleatorio y se calcula el dividendo.
   const generateQuestion = () => {
-    const base = selectedBase;
-    const addend = Math.floor(Math.random() * 13) + 1; // Número aleatorio entre 1 y 13
-    const correctAnswer = base + addend;
-    setCurrentQuestion({ base, addend, correctAnswer });
+    const divisor = selectedDivisor;
+    const quotient = Math.floor(Math.random() * 13) + 1; // Cociente entre 1 y 13
+    const dividend = divisor * quotient;
+    setCurrentQuestion({ dividend, divisor, correctAnswer: quotient });
   };
 
   // Función para mezclar un arreglo (para las opciones de respuesta)
@@ -64,7 +65,7 @@ const GameSumas = ({ onGameOver }) => {
     return shuffleArray(options);
   };
 
-  // useEffect para la etapa de desafío: se genera la pregunta cada vez que cambia questionNumber o stage
+  // Cada vez que se inicia la etapa challenge o se actualiza el número de pregunta, se genera una nueva pregunta.
   useEffect(() => {
     if (stage === "challenge") {
       generateQuestion();
@@ -80,7 +81,7 @@ const GameSumas = ({ onGameOver }) => {
       setScore(score + 1);
       setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
-          alert(`¡Excelente! Has dominado la suma con ${selectedBase}. ¡Felicidades!`);
+          alert(`¡Excelente! Has dominado la división con el divisor ${selectedDivisor}. ¡Felicidades!`);
           onGameOver();
         } else {
           setQuestionNumber(questionNumber + 1);
@@ -118,43 +119,44 @@ const GameSumas = ({ onGameOver }) => {
 
   let content;
   if (stage === "learning") {
-    if (!selectedBase) {
-      // Pantalla para seleccionar el número base para sumar (sin botón "Volver al inicio")
+    if (!selectedDivisor) {
+      // Pantalla para seleccionar el divisor (por ejemplo, de 2 a 13)
       content = (
         <div className="learning-stage">
-          <h2>Aprende a Sumar</h2>
-          <p>Elige el número base para practicar la suma:</p>
+          <h2>Aprende a Dividir</h2>
+          <p>Elige el divisor que quieres aprender:</p>
           <div className="table-options">
-            {Array.from({ length: 13 }, (_, i) => i + 1).map((num) => (
-              <button key={num} onClick={() => setSelectedBase(num)}>
-                Número {num}
+            {Array.from({ length: 12 }, (_, i) => i + 2).map((num) => (
+              <button key={num} onClick={() => setSelectedDivisor(num)}>
+                Divisor {num}
               </button>
             ))}
           </div>
         </div>
       );
     } else {
-      // Mostrar la lección con la grilla de sumas, resaltando la operación completa
+      // Mostrar la lección: se muestra una grilla con la tabla de división para el divisor seleccionado.
+      // Se generan operaciones donde el dividendo es el divisor multiplicado por un número (de 1 a 13) y el cociente es ese número.
       const rows = Array.from({ length: 13 }, (_, i) => i + 1);
       content = (
         <div className="learning-stage">
-          <h2>Suma con {selectedBase}</h2>
+          <h2>División con {selectedDivisor}</h2>
           <div className="table-grid">
             {rows.map((num) => (
               <div key={num} className="table-cell">
                 <span className="table-expression">
-                  {selectedBase} + {num} = {selectedBase + num}
+                  {selectedDivisor * num} ÷ {selectedDivisor} = {num}
                 </span>
               </div>
             ))}
           </div>
           <p className="learning-instruction">
-            ¡Mira cada operación, repítela en voz alta y conviértete en un experto en sumas!
+            ¡Mira cómo se reparten los objetos de forma equitativa, repítelo en voz alta y conviértete en un experto repartidor!
           </p>
           <button onClick={() => setStage("challenge")} className="next-button">
             ¡Listo, vamos a jugar!
           </button>
-          <button onClick={() => setSelectedBase(null)} className="back-button">
+          <button onClick={() => setSelectedDivisor(null)} className="back-button">
             Volver
           </button>
         </div>
@@ -169,11 +171,11 @@ const GameSumas = ({ onGameOver }) => {
       content = (
         <div className="game-container">
           <h2 className="game-title">
-            Desafío: Suma con {selectedBase}
+            Desafío: División con {selectedDivisor}
           </h2>
           <div className="question">
             <p>
-              {currentQuestion.base} + {currentQuestion.addend} = ?
+              {currentQuestion.dividend} ÷ {currentQuestion.divisor} = ?
             </p>
             <div className="answer-buttons">
               {getAnswerOptions().map((option, index) => (
@@ -206,4 +208,4 @@ const GameSumas = ({ onGameOver }) => {
   return <div>{content}</div>;
 };
 
-export default GameSumas;
+export default GameDivision;

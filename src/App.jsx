@@ -6,6 +6,7 @@ import Profile from './components/Profile';
 import GameSumas from './components/GameSumas';
 import GameRestas from './components/GameRestas';
 import GameMultiplicacion from './components/GameMultiplicacion';
+import GameDivision from './components/GameDivision';
 
 function App() {
   const [character, setCharacter] = useState(null);
@@ -39,6 +40,10 @@ function App() {
     } else if (game === 'Multiplicación') {
       setSelectedGame(
         <GameMultiplicacion onGameOver={handleBack} />
+      );
+    } else if (game === 'División') {
+      setSelectedGame(
+        <GameDivision onGameOver={handleBack} />
       );
     }
     // Puedes agregar otros juegos aquí...

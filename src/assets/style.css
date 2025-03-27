@@ -384,3 +384,109 @@ body {
     background: #ff4a3a;
   }
   
+ /* Estilos para la etapa de aprendizaje */
+.learning-stage {
+    background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    margin: 20px auto;
+    max-width: 800px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .learning-stage h2 {
+    font-size: 32px;
+    color: #ff6f61;
+    margin-bottom: 20px;
+  }
+  
+  .learning-stage p {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .learning-instruction {
+    font-size: 22px;
+    color: #444;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  
+  /* Estilos para la grilla de la tabla de multiplicar */
+  .table-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+  }
+  
+  .table-cell {
+    background: #ff6f61;
+    color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    font-size: 24px;
+    font-weight: bold;
+    transition: transform 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .table-cell:hover {
+    transform: scale(1.05);
+  }
+  
+  .table-expression {
+    /* Se destaca toda la operación */
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+  }
+  
+  /* Estilos para los botones de selección de tabla */
+  .table-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .table-options button {
+    background: #ff6f61;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+  }
+  
+  .table-options button:hover {
+    background: #ff4a3a;
+    transform: scale(1.05);
+  }
+  
+  /* Estilos para los botones de navegación */
+  .next-button, .back-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .next-button:hover, .back-button:hover {
+    background: #45a049;
+  }
+  
+  /* Otros estilos para el juego de desafío se mantienen para el resto de la aplicación */
