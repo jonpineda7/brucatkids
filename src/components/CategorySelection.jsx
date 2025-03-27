@@ -3,7 +3,7 @@ import React from 'react';
 
 const categories = {
     KINDER: ['Matemáticas', 'Colores', 'Memoria'],
-    'Tercero Básico': ['Lenguaje', 'Ciencias', 'Matemáticas'],
+    'Tercero Básico': ['Matemáticas', 'Lenguaje', 'Ciencias'],
   };
   
 

@@ -29,10 +29,7 @@ function App() {
     if (game === 'Suma') {
       setSelectedGame(
         <GameSumas 
-          lives={lives} 
-          setLives={setLives} 
-          score={score} 
-          setScore={setScore} 
+          onGameOver={handleBack}  // Reutilizamos handleBack para volver al home
         />
       );
     }
@@ -65,7 +62,6 @@ function App() {
           {course === null ? (
             <div>
               <button onClick={() => handleCourseSelect('KINDER')}>KINDER</button>
-              <button onClick={() => handleCourseSelect('Primero Básico')}>Primero Básico</button>
               <button onClick={() => handleCourseSelect('Tercero Básico')}>Tercero Básico</button>
             </div>
           ) : category === null ? (

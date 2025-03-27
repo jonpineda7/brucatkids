@@ -5,8 +5,8 @@ function CourseSelection({ onSelectCourse }) {
     <div>
       <h2>Selecciona el curso</h2>
       <button onClick={() => onSelectCourse("KINDER")}>KINDER</button>
-      <button onClick={() => onSelectCourse("Primero Básico")}>
-        Primero Básico
+      <button onClick={() => onSelectCourse("Tercero Básico")}>
+        Tercero Básico
       </button>
       {/* Agregar más cursos aquí */}
     </div>
