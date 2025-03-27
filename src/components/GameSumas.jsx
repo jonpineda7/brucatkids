@@ -6,6 +6,8 @@ const SumasJuego = ({ lives, setLives, score, setScore }) => {
   const [questionNumber, setQuestionNumber] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
 
+  const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3"); // Ruta del sonido de error
+
   const generateQuestion = () => {
     const level = questionNumber + 1;
     const num1 = Math.floor(Math.random() * (level * 10));
@@ -21,6 +23,7 @@ const SumasJuego = ({ lives, setLives, score, setScore }) => {
       setCorrectAnswers(prevCorrectAnswers => prevCorrectAnswers + 1);
     } else {
       setLives(prevLives => prevLives - 1);
+      wrongAnswerSound.play();  // Reproducir sonido al equivocarse
     }
 
     if (lives > 1) {
