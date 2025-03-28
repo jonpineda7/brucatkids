@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-const totalQuestions = 10;
-const initialLives = 5;
+import SuccessModal from './SuccessModal';
 
 const GameOverModal = ({ onGameOver }) => (
   <div className="modal-overlay">
@@ -15,34 +13,38 @@ const GameOverModal = ({ onGameOver }) => (
   </div>
 );
 
-const GameRestas = ({ onGameOver }) => {
-  // Etapa: "learning" o "challenge"
-  const [stage, setStage] = useState("learning");
-  // Para la resta, el número base (minuendo) debe ser al menos 2
+const initialLives = 5;
+const totalQuestions = 10;
+
+const GameRestas = ({ onGameOver, score, setScore }) => {
+  // Controla la etapa: "learning" o "challenge"
+  const [stage, setStage] = useState('learning');
+  // Número base (minuendo) seleccionado
   const [selectedBase, setSelectedBase] = useState(null);
 
-  // Estados para la etapa de desafío ("challenge")
+  // Estados para la etapa challenge
   const [lives, setLives] = useState(initialLives);
-  const [score, setScore] = useState(0);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [lifeLost, setLifeLost] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOverState, setGameOverState] = useState(false);
+  // Controla si mostramos el modal de éxito
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Sonidos para feedback (verifica que las rutas sean correctas)
+  // Sonidos de feedback
   const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3");
   const correctSound = new Audio("/brucatkids/sounds/correct.mp3");
 
-  // Genera una pregunta para la etapa de desafío
-  // Usamos el número base como minuendo y elegimos un sustraendo aleatorio entre 1 y el número base
+  // Genera una pregunta de resta
+  // Usamos "selectedBase" como minuendo y elegimos un sustraendo aleatorio [1, selectedBase]
   const generateQuestion = () => {
-    const subtrahend = Math.floor(Math.random() * selectedBase) + 1; // Entre 1 y selectedBase
+    const subtrahend = Math.floor(Math.random() * selectedBase) + 1;
     const correctAnswer = selectedBase - subtrahend;
-    setCurrentQuestion({ selectedBase, subtrahend, correctAnswer });
+    setCurrentQuestion({ minuendo: selectedBase, subtrahend, correctAnswer });
   };
 
-  // Función para mezclar un arreglo (para las opciones de respuesta)
+  // Mezcla un arreglo para las opciones de respuesta
   const shuffleArray = (array) => {
     let newArray = array.slice();
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -64,8 +66,9 @@ const GameRestas = ({ onGameOver }) => {
     return shuffleArray(options);
   };
 
+  // Cada vez que cambia el número de pregunta o la etapa es "challenge", se genera una nueva pregunta
   useEffect(() => {
-    if (stage === "challenge") {
+    if (stage === 'challenge') {
       generateQuestion();
       setLifeLost(false);
       setSelectedOption(null);
@@ -76,13 +79,12 @@ const GameRestas = ({ onGameOver }) => {
     setSelectedOption(option);
     if (option === currentQuestion.correctAnswer) {
       correctSound.play();
-      setScore(score + 1);
+      setScore(prev => prev + 1);
       setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
-          alert(`¡Excelente! Has dominado la resta con ${selectedBase}. ¡Felicidades!`);
-          onGameOver();
+          setShowSuccessModal(true);  // Mostramos el SuccessModal
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     } else {
@@ -92,9 +94,9 @@ const GameRestas = ({ onGameOver }) => {
       setLifeLost(true);
       setTimeout(() => {
         if (newLives <= 0) {
-          setGameOver(true);
+          setGameOverState(true);
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     }
@@ -115,14 +117,26 @@ const GameRestas = ({ onGameOver }) => {
     return hearts;
   };
 
+  // Cierra el modal de éxito y llama a onGameOver (para volver al home o listado de juegos)
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    onGameOver();
+  };
+
   let content;
-  if (stage === "learning") {
+
+  // Etapa "learning"
+  if (stage === 'learning') {
     if (!selectedBase) {
-      // Pantalla para seleccionar el número base (minuendo) para practicar la resta.
-      // Se elimina el botón "Volver al inicio" para que solo se muestre "Volver" en otros niveles.
       content = (
         <div className="learning-stage">
           <h2>Aprende a Restar</h2>
+          {/* Resumen breve de la operación Resta */}
+          <p className="learning-explanation">
+            La <strong>resta</strong> nos ayuda a saber cuántos elementos quedan 
+            cuando quitamos parte de un conjunto. Por ejemplo, si tienes 5 manzanas 
+            y regalas 2, te quedan 3.
+          </p>
           <p>Elige el número mayor (minuendo) para practicar la resta:</p>
           <div className="table-options">
             {Array.from({ length: 12 }, (_, i) => i + 2).map((num) => (
@@ -134,7 +148,7 @@ const GameRestas = ({ onGameOver }) => {
         </div>
       );
     } else {
-      // Mostrar la lección de resta en formato grid, con operaciones completas resaltadas.
+      // Mostrar la "tabla" de resta: para cada i [1..selectedBase], mostramos "selectedBase - i = X"
       const rows = Array.from({ length: selectedBase }, (_, i) => i + 1);
       content = (
         <div className="learning-stage">
@@ -151,7 +165,7 @@ const GameRestas = ({ onGameOver }) => {
           <p className="learning-instruction">
             ¡Observa cada operación, repítela en voz alta y conviértete en un experto en restas!
           </p>
-          <button onClick={() => setStage("challenge")} className="next-button">
+          <button onClick={() => setStage('challenge')} className="next-button">
             ¡Listo, vamos a jugar!
           </button>
           <button onClick={() => setSelectedBase(null)} className="back-button">
@@ -160,10 +174,13 @@ const GameRestas = ({ onGameOver }) => {
         </div>
       );
     }
-  } else if (stage === "challenge") {
+  }
+
+  // Etapa "challenge"
+  else if (stage === 'challenge') {
     if (!currentQuestion) {
       content = <div>Cargando...</div>;
-    } else if (gameOver) {
+    } else if (gameOverState) {
       content = <GameOverModal onGameOver={onGameOver} />;
     } else {
       content = (
@@ -173,7 +190,7 @@ const GameRestas = ({ onGameOver }) => {
           </h2>
           <div className="question">
             <p>
-              {currentQuestion.selectedBase} - {currentQuestion.subtrahend} = ?
+              {currentQuestion.minuendo} - {currentQuestion.subtrahend} = ?
             </p>
             <div className="answer-buttons">
               {getAnswerOptions().map((option, index) => (
@@ -203,7 +220,17 @@ const GameRestas = ({ onGameOver }) => {
     }
   }
 
-  return <div>{content}</div>;
+  return (
+    <div>
+      {content}
+      {showSuccessModal && (
+        <SuccessModal
+          message={`¡Increíble trabajo! Has dominado la resta con ${selectedBase}. ¡Eres una verdadera estrella de las matemáticas! Sigue practicando y verás cómo cada día te vuelves más fuerte.`}
+          onConfirm={closeSuccessModal}
+        />
+      )}
+    </div>
+  );
 };
 
 export default GameRestas;

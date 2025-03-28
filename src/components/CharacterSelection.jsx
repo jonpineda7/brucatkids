@@ -20,9 +20,9 @@ function CharacterSelection({ onSelect }) {
         onClick={() => handleCharacterSelect('knight')}
       />
       <img
-        alt="Fox"
-        src="/brucatkids/images/fox.png"
-        onClick={() => handleCharacterSelect('fox')}
+        alt="Unicorn"
+        src="/brucatkids/images/unicorn.png"
+        onClick={() => handleCharacterSelect('unicorn')}
       />
       <img
         alt="Astronaut"

@@ -1,0 +1,39 @@
+.profile-container {
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .profile-container h2 {
+    font-size: 28px;
+    color: #333;
+  }
+  
+  .profile-image {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 50%;
+    transition: transform 0.5s, box-shadow 0.5s;
+  }
+  
+  .profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Efecto de brillo cuando el personaje evoluciona */
+  .profile-image.shining {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px 5px rgba(255,215,0,0.8); /* Brillo dorado */
+  }
+  
+  .profile-container p {
+    font-size: 20px;
+    color: #666;
+  }

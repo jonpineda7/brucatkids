@@ -1,0 +1,87 @@
+.bonus-game {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #e1bee7, #ce93d8);
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 600px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .bonus-game h2 {
+    font-size: 32px;
+    color: #8e24aa;
+    margin-bottom: 10px;
+  }
+  
+  .bonus-game p {
+    font-size: 20px;
+    color: #4a148c;
+    margin: 10px 0;
+  }
+  
+  .bonus-area {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border: 2px dashed #8e24aa;
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.6);
+  }
+  
+  .star {
+    position: absolute;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .star:hover {
+    transform: scale(1.2);
+  }
+
+  .bonus-game {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #e1bee7, #ce93d8);
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 600px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .bonus-game h2 {
+    font-size: 32px;
+    color: #8e24aa;
+    margin-bottom: 10px;
+  }
+  
+  .bonus-game p {
+    font-size: 20px;
+    color: #4a148c;
+    margin: 10px 0;
+  }
+  
+  .bonus-area {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border: 2px dashed #8e24aa;
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.6);
+  }
+  
+  .star {
+    position: absolute;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .star:hover {
+    transform: scale(1.2);
+  }

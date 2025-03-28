@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import SuccessModal from './SuccessModal';
 
-const totalQuestions = 10;
-const initialLives = 5;
-
+// Modal de Game Over, diseño coherente al resto
 const GameOverModal = ({ onGameOver }) => (
   <div className="modal-overlay">
     <div className="modal-content">
@@ -15,35 +14,39 @@ const GameOverModal = ({ onGameOver }) => (
   </div>
 );
 
-const GameDivision = ({ onGameOver }) => {
-  // Etapa: "learning" o "challenge"
-  const [stage, setStage] = useState("learning");
-  // Estado para el divisor seleccionado (para aprender a dividir)
+const initialLives = 5;
+const totalQuestions = 10;
+
+const GameDivision = ({ onGameOver, score, setScore }) => {
+  // Etapa actual: "learning" o "challenge"
+  const [stage, setStage] = useState('learning');
+  // Divisor seleccionado para aprender la división
   const [selectedDivisor, setSelectedDivisor] = useState(null);
 
-  // Estados para la etapa de desafío ("challenge")
+  // Estados para la etapa challenge
   const [lives, setLives] = useState(initialLives);
-  const [score, setScore] = useState(0);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [lifeLost, setLifeLost] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOverState, setGameOverState] = useState(false);
+  // Controla la aparición del SuccessModal
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Sonidos para feedback (verifica que las rutas sean correctas)
+  // Sonidos de feedback
   const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3");
   const correctSound = new Audio("/brucatkids/sounds/correct.mp3");
 
-  // En la etapa de challenge, se genera una pregunta de división.
-  // Para evitar fracciones, se genera un cociente aleatorio y se calcula el dividendo.
+  // Genera una pregunta de división
+  // Para evitar fracciones, generamos un cociente aleatorio [1..13] y multiplicamos por el divisor para obtener el dividendo
   const generateQuestion = () => {
     const divisor = selectedDivisor;
-    const quotient = Math.floor(Math.random() * 13) + 1; // Cociente entre 1 y 13
+    const quotient = Math.floor(Math.random() * 13) + 1;
     const dividend = divisor * quotient;
     setCurrentQuestion({ dividend, divisor, correctAnswer: quotient });
   };
 
-  // Función para mezclar un arreglo (para las opciones de respuesta)
+  // Mezcla un arreglo para las opciones de respuesta
   const shuffleArray = (array) => {
     let newArray = array.slice();
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -65,9 +68,9 @@ const GameDivision = ({ onGameOver }) => {
     return shuffleArray(options);
   };
 
-  // Cada vez que se inicia la etapa challenge o se actualiza el número de pregunta, se genera una nueva pregunta.
+  // Cuando pasamos a la etapa "challenge" o se actualiza questionNumber, generamos una nueva pregunta
   useEffect(() => {
-    if (stage === "challenge") {
+    if (stage === 'challenge') {
       generateQuestion();
       setLifeLost(false);
       setSelectedOption(null);
@@ -78,13 +81,12 @@ const GameDivision = ({ onGameOver }) => {
     setSelectedOption(option);
     if (option === currentQuestion.correctAnswer) {
       correctSound.play();
-      setScore(score + 1);
+      setScore(prev => prev + 1);
       setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
-          alert(`¡Excelente! Has dominado la división con el divisor ${selectedDivisor}. ¡Felicidades!`);
-          onGameOver();
+          setShowSuccessModal(true);
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     } else {
@@ -94,9 +96,9 @@ const GameDivision = ({ onGameOver }) => {
       setLifeLost(true);
       setTimeout(() => {
         if (newLives <= 0) {
-          setGameOver(true);
+          setGameOverState(true);
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     }
@@ -117,13 +119,24 @@ const GameDivision = ({ onGameOver }) => {
     return hearts;
   };
 
+  // Cierra el SuccessModal y llama a onGameOver
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    onGameOver();
+  };
+
   let content;
-  if (stage === "learning") {
+  // Etapa "learning"
+  if (stage === 'learning') {
     if (!selectedDivisor) {
-      // Pantalla para seleccionar el divisor (por ejemplo, de 2 a 13)
       content = (
         <div className="learning-stage">
-          <h2>Aprende a Dividir</h2>
+          <h2>Aprende la División</h2>
+          <p className="learning-explanation">
+            La <strong>división</strong> sirve para repartir de forma equitativa. 
+            Por ejemplo, si tienes 12 caramelos y los quieres repartir entre 3 amigos, 
+            cada uno recibe 4 caramelos (12 ÷ 3 = 4).
+          </p>
           <p>Elige el divisor que quieres aprender:</p>
           <div className="table-options">
             {Array.from({ length: 12 }, (_, i) => i + 2).map((num) => (
@@ -135,8 +148,8 @@ const GameDivision = ({ onGameOver }) => {
         </div>
       );
     } else {
-      // Mostrar la lección: se muestra una grilla con la tabla de división para el divisor seleccionado.
-      // Se generan operaciones donde el dividendo es el divisor multiplicado por un número (de 1 a 13) y el cociente es ese número.
+      // Mostrar la "tabla" de división: para cada i [1..13], dividend = divisor * i
+      // y cociente = i
       const rows = Array.from({ length: 13 }, (_, i) => i + 1);
       content = (
         <div className="learning-stage">
@@ -151,9 +164,9 @@ const GameDivision = ({ onGameOver }) => {
             ))}
           </div>
           <p className="learning-instruction">
-            ¡Mira cómo se reparten los objetos de forma equitativa, repítelo en voz alta y conviértete en un experto repartidor!
+            ¡Mira cómo se reparten los objetos de forma equitativa, repítelo en voz alta y conviértete en un experto!
           </p>
-          <button onClick={() => setStage("challenge")} className="next-button">
+          <button onClick={() => setStage('challenge')} className="next-button">
             ¡Listo, vamos a jugar!
           </button>
           <button onClick={() => setSelectedDivisor(null)} className="back-button">
@@ -162,10 +175,13 @@ const GameDivision = ({ onGameOver }) => {
         </div>
       );
     }
-  } else if (stage === "challenge") {
+  }
+
+  // Etapa "challenge"
+  else if (stage === 'challenge') {
     if (!currentQuestion) {
       content = <div>Cargando...</div>;
-    } else if (gameOver) {
+    } else if (gameOverState) {
       content = <GameOverModal onGameOver={onGameOver} />;
     } else {
       content = (
@@ -205,7 +221,17 @@ const GameDivision = ({ onGameOver }) => {
     }
   }
 
-  return <div>{content}</div>;
+  return (
+    <div>
+      {content}
+      {showSuccessModal && (
+        <SuccessModal
+          message={`¡Increíble trabajo! Has dominado la división con ${selectedDivisor}. ¡Eres una verdadera estrella de las matemáticas! Sigue practicando y verás cómo cada día te vuelves más fuerte.`}
+          onConfirm={closeSuccessModal}
+        />
+      )}
+    </div>
+  );
 };
 
 export default GameDivision;

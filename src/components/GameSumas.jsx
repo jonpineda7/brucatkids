@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import SuccessModal from './SuccessModal';
 
 const totalQuestions = 10;
 const initialLives = 5;
 
+// Modal de Game Over, mismo estilo para mantener coherencia
 const GameOverModal = ({ onGameOver }) => (
   <div className="modal-overlay">
     <div className="modal-content">
@@ -15,34 +17,35 @@ const GameOverModal = ({ onGameOver }) => (
   </div>
 );
 
-const GameSumas = ({ onGameOver }) => {
-  // Estado para controlar la etapa: "learning" o "challenge"
+const GameSumas = ({ onGameOver, score, setScore }) => {
+  // Etapa actual: "learning" o "challenge"
   const [stage, setStage] = useState("learning");
-  // Estado para el número base seleccionado para practicar la suma
+  // Número base seleccionado para practicar la suma
   const [selectedBase, setSelectedBase] = useState(null);
 
   // Estados para la etapa de desafío ("challenge")
   const [lives, setLives] = useState(initialLives);
-  const [score, setScore] = useState(0);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [lifeLost, setLifeLost] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOverState, setGameOverState] = useState(false);
+  // Controla la aparición del SuccessModal
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Sonidos para feedback (asegúrate de que las rutas sean correctas)
+  // Sonidos de feedback
   const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3");
   const correctSound = new Audio("/brucatkids/sounds/correct.mp3");
 
-  // Genera una pregunta para la etapa de desafío basada en el número base
+  // Genera una pregunta para la etapa de desafío
   const generateQuestion = () => {
     const base = selectedBase;
-    const addend = Math.floor(Math.random() * 13) + 1; // Número aleatorio entre 1 y 13
+    const addend = Math.floor(Math.random() * 13) + 1; // Entre 1 y 13
     const correctAnswer = base + addend;
     setCurrentQuestion({ base, addend, correctAnswer });
   };
 
-  // Función para mezclar un arreglo (para las opciones de respuesta)
+  // Mezcla un arreglo (para opciones de respuesta)
   const shuffleArray = (array) => {
     let newArray = array.slice();
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -64,7 +67,7 @@ const GameSumas = ({ onGameOver }) => {
     return shuffleArray(options);
   };
 
-  // useEffect para la etapa de desafío: se genera la pregunta cada vez que cambia questionNumber o stage
+  // useEffect: al cambiar questionNumber o cambiar a stage "challenge", generamos una nueva pregunta
   useEffect(() => {
     if (stage === "challenge") {
       generateQuestion();
@@ -77,13 +80,13 @@ const GameSumas = ({ onGameOver }) => {
     setSelectedOption(option);
     if (option === currentQuestion.correctAnswer) {
       correctSound.play();
-      setScore(score + 1);
+      setScore(prev => prev + 1);
       setTimeout(() => {
+        // Si se alcanzó el total de preguntas, mostrar modal de éxito
         if (questionNumber + 1 >= totalQuestions) {
-          alert(`¡Excelente! Has dominado la suma con ${selectedBase}. ¡Felicidades!`);
-          onGameOver();
+          setShowSuccessModal(true);
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     } else {
@@ -93,14 +96,15 @@ const GameSumas = ({ onGameOver }) => {
       setLifeLost(true);
       setTimeout(() => {
         if (newLives <= 0) {
-          setGameOver(true);
+          setGameOverState(true);
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     }
   };
 
+  // Renderiza los corazones para mostrar las vidas
   const renderHearts = () => {
     const hearts = [];
     for (let i = 0; i < lives; i++) {
@@ -116,13 +120,24 @@ const GameSumas = ({ onGameOver }) => {
     return hearts;
   };
 
+  // Cierra el modal de éxito y llama a onGameOver para volver
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    onGameOver();
+  };
+
   let content;
   if (stage === "learning") {
     if (!selectedBase) {
-      // Pantalla para seleccionar el número base para sumar (sin botón "Volver al inicio")
+      // Etapa de aprendizaje: explicación de la suma y selección del número base
       content = (
         <div className="learning-stage">
           <h2>Aprende a Sumar</h2>
+          <p className="learning-explanation">
+            La <strong>suma</strong> nos ayuda a saber cuántos elementos tenemos 
+            cuando juntamos dos o más conjuntos. Por ejemplo, si tienes 3 manzanas 
+            y obtienes 2 más, ahora tendrás 5 manzanas en total.
+          </p>
           <p>Elige el número base para practicar la suma:</p>
           <div className="table-options">
             {Array.from({ length: 13 }, (_, i) => i + 1).map((num) => (
@@ -134,7 +149,7 @@ const GameSumas = ({ onGameOver }) => {
         </div>
       );
     } else {
-      // Mostrar la lección con la grilla de sumas, resaltando la operación completa
+      // Mostrar la "tabla" de suma con el número base
       const rows = Array.from({ length: 13 }, (_, i) => i + 1);
       content = (
         <div className="learning-stage">
@@ -163,7 +178,7 @@ const GameSumas = ({ onGameOver }) => {
   } else if (stage === "challenge") {
     if (!currentQuestion) {
       content = <div>Cargando...</div>;
-    } else if (gameOver) {
+    } else if (gameOverState) {
       content = <GameOverModal onGameOver={onGameOver} />;
     } else {
       content = (
@@ -203,7 +218,17 @@ const GameSumas = ({ onGameOver }) => {
     }
   }
 
-  return <div>{content}</div>;
+  return (
+    <div>
+      {content}
+      {showSuccessModal && (
+        <SuccessModal 
+          message={`¡Increíble trabajo! Has dominado la suma con ${selectedBase}. ¡Eres un verdadero campeón de las matemáticas! Sigue practicando y verás cómo cada día te vuelves más fuerte.`}
+          onConfirm={closeSuccessModal}
+        />
+      )}
+    </div>
+  );
 };
 
 export default GameSumas;

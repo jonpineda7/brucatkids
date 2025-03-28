@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import SuccessModal from './SuccessModal';
 
 const totalQuestions = 10;
 const initialLives = 5;
 
+// Modal de Game Over con estilo coherente
 const GameOverModal = ({ onGameOver }) => (
   <div className="modal-overlay">
     <div className="modal-content">
@@ -15,34 +17,35 @@ const GameOverModal = ({ onGameOver }) => (
   </div>
 );
 
-const GameMultiplicacion = ({ onGameOver }) => {
-  // Estado para controlar la etapa: "learning" o "challenge"
+const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
+  // Etapa actual: "learning" o "challenge"
   const [stage, setStage] = useState("learning");
-  // Estado para la tabla seleccionada para multiplicar
+  // Tabla de multiplicar seleccionada
   const [selectedTable, setSelectedTable] = useState(null);
 
   // Estados para la etapa de desafío ("challenge")
   const [lives, setLives] = useState(initialLives);
-  const [score, setScore] = useState(0);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [lifeLost, setLifeLost] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOverState, setGameOverState] = useState(false);
+  // Controla la aparición del SuccessModal
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Sonidos para feedback (verifica que las rutas sean correctas)
+  // Sonidos de feedback
   const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3");
   const correctSound = new Audio("/brucatkids/sounds/correct.mp3");
 
-  // Función para generar una pregunta para la etapa de desafío
+  // Genera una pregunta para la etapa de desafío
   const generateQuestion = () => {
     const factor1 = selectedTable;
-    const factor2 = Math.floor(Math.random() * 13) + 1; // Número aleatorio entre 1 y 13
+    const factor2 = Math.floor(Math.random() * 13) + 1; // Entre 1 y 13
     const correctAnswer = factor1 * factor2;
     setCurrentQuestion({ factor1, factor2, correctAnswer });
   };
 
-  // Función para mezclar un arreglo (para las opciones de respuesta)
+  // Mezcla un arreglo (para las opciones de respuesta)
   const shuffleArray = (array) => {
     let newArray = array.slice();
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -52,7 +55,7 @@ const GameMultiplicacion = ({ onGameOver }) => {
     return newArray;
   };
 
-  // Genera las opciones de respuesta para la pregunta actual
+  // Genera las opciones de respuesta
   const getAnswerOptions = () => {
     if (!currentQuestion) return [];
     const { correctAnswer } = currentQuestion;
@@ -64,7 +67,7 @@ const GameMultiplicacion = ({ onGameOver }) => {
     return shuffleArray(options);
   };
 
-  // useEffect para la etapa de desafío: se genera una nueva pregunta cada vez que cambia el número de pregunta o la etapa
+  // Cuando el stage es "challenge" o se cambia el número de pregunta, generamos una nueva
   useEffect(() => {
     if (stage === "challenge") {
       generateQuestion();
@@ -77,13 +80,12 @@ const GameMultiplicacion = ({ onGameOver }) => {
     setSelectedOption(option);
     if (option === currentQuestion.correctAnswer) {
       correctSound.play();
-      setScore(score + 1);
+      setScore(prev => prev + 1);
       setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
-          alert(`¡Excelente! Has dominado la tabla del ${selectedTable}. ¡Felicidades!`);
-          onGameOver();
+          setShowSuccessModal(true);
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     } else {
@@ -93,9 +95,9 @@ const GameMultiplicacion = ({ onGameOver }) => {
       setLifeLost(true);
       setTimeout(() => {
         if (newLives <= 0) {
-          setGameOver(true);
+          setGameOverState(true);
         } else {
-          setQuestionNumber(questionNumber + 1);
+          setQuestionNumber(prev => prev + 1);
         }
       }, 1000);
     }
@@ -116,13 +118,24 @@ const GameMultiplicacion = ({ onGameOver }) => {
     return hearts;
   };
 
+  // Cierra el SuccessModal y llama a onGameOver
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    onGameOver();
+  };
+
   let content;
   if (stage === "learning") {
     if (!selectedTable) {
-      // Pantalla para seleccionar la tabla de multiplicar
+      // Etapa de aprendizaje: explicación de la multiplicación y selección de la tabla
       content = (
         <div className="learning-stage">
           <h2>Aprende la Tabla de Multiplicar</h2>
+          <p className="learning-explanation">
+            La <strong>multiplicación</strong> sirve para sumar un mismo número 
+            varias veces de manera más rápida. Por ejemplo, 3 x 4 equivale a sumar 
+            3 + 3 + 3 + 3, dando como resultado 12.
+          </p>
           <p>Elige la tabla que quieres aprender:</p>
           <div className="table-options">
             {Array.from({ length: 13 }, (_, i) => i + 1).map((num) => (
@@ -134,7 +147,7 @@ const GameMultiplicacion = ({ onGameOver }) => {
         </div>
       );
     } else {
-      // Mostrar la lección en una grilla con la operación completa resaltada
+      // Mostrar la "tabla" de multiplicación
       const rows = Array.from({ length: 13 }, (_, i) => i + 1);
       content = (
         <div className="learning-stage">
@@ -163,7 +176,7 @@ const GameMultiplicacion = ({ onGameOver }) => {
   } else if (stage === "challenge") {
     if (!currentQuestion) {
       content = <div>Cargando...</div>;
-    } else if (gameOver) {
+    } else if (gameOverState) {
       content = <GameOverModal onGameOver={onGameOver} />;
     } else {
       content = (
@@ -203,7 +216,17 @@ const GameMultiplicacion = ({ onGameOver }) => {
     }
   }
 
-  return <div>{content}</div>;
+  return (
+    <div>
+      {content}
+      {showSuccessModal && (
+        <SuccessModal
+          message={`¡Increíble trabajo! Has dominado la tabla del ${selectedTable}. ¡Eres una verdadera estrella de la multiplicación! Sigue practicando y verás cómo cada día te vuelves más fuerte.`}
+          onConfirm={closeSuccessModal}
+        />
+      )}
+    </div>
+  );
 };
 
 export default GameMultiplicacion;
