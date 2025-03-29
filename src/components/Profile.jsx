@@ -1,68 +1,74 @@
 import React, { useEffect, useState } from 'react';
 import '/src/assets/Profile.css';
 
-// Evoluciones de todos los personajes
+// Definición de niveles de evolución para cada personaje
 const allEvolutionLevels = {
   robot: [
-    { threshold: 0, image: '/brucatkids/images/robot.png' },
-    { threshold: 10, image: '/brucatkids/images/robot2.png' },
-    { threshold: 20, image: '/brucatkids/images/robot3.png' },
-    { threshold: 30, image: '/brucatkids/images/robot4.png' },
+    { thresholdMin: 0, thresholdMax: 9, image: '/brucatkids/images/robot.png' },
+    { thresholdMin: 10, thresholdMax: 19, image: '/brucatkids/images/robot2.png' },
+    { thresholdMin: 20, thresholdMax: 29, image: '/brucatkids/images/robot3.png' },
+    { thresholdMin: 30, thresholdMax: Infinity, image: '/brucatkids/images/robot4.png' },
   ],
   knight: [
-    { threshold: 0, image: '/brucatkids/images/knight.png' },
-    // Podrías añadir knight2, knight3... si tienes
+    { thresholdMin: 0, thresholdMax: 9, image: '/brucatkids/images/knight.png' },
+    { thresholdMin: 10, thresholdMax: 19, image: '/brucatkids/images/knight2.png' },
+    { thresholdMin: 20, thresholdMax: 29, image: '/brucatkids/images/knight3.png' },
+    { thresholdMin: 30, thresholdMax: Infinity, image: '/brucatkids/images/knight4.png' },
   ],
   unicorn: [
-    { threshold: 0, image: '/brucatkids/images/unicorn.png' },
-    // ...
+    { thresholdMin: 0, thresholdMax: 9, image: '/brucatkids/images/unicorn.png' },
+    { thresholdMin: 10, thresholdMax: 19, image: '/brucatkids/images/unicorn2.png' },
+    { thresholdMin: 20, thresholdMax: 29, image: '/brucatkids/images/unicorn3.png' },
+    { thresholdMin: 30, thresholdMax: Infinity, image: '/brucatkids/images/unicorn4.png' },
   ],
   astronaut: [
-    { threshold: 0, image: '/brucatkids/images/astronaut.png' },
-    // ...
+    { thresholdMin: 0, thresholdMax: 9, image: '/brucatkids/images/astronaut.png' },
+    { thresholdMin: 10, thresholdMax: 19, image: '/brucatkids/images/astronaut2.png' },
+    { thresholdMin: 20, thresholdMax: 29, image: '/brucatkids/images/astronaut3.png' },
+    { thresholdMin: 30, thresholdMax: Infinity, image: '/brucatkids/images/astronaut4.png' },
   ],
   cat: [
-    { threshold: 0, image: '/brucatkids/images/cat.png' },
-    // ...
+    { thresholdMin: 0, thresholdMax: 9, image: '/brucatkids/images/cat.png' },
+    { thresholdMin: 10, thresholdMax: 19, image: '/brucatkids/images/cat2.png' },
+    { thresholdMin: 20, thresholdMax: 29, image: '/brucatkids/images/cat3.png' },
+    { thresholdMin: 30, thresholdMax: Infinity, image: '/brucatkids/images/cat4.png' },
   ],
 };
 
 const Profile = ({ character, score }) => {
-  // Buscamos el array de evolución según el personaje. 
-  // Si no existe, usamos robot como fallback:
+  // Seleccionamos el conjunto de evoluciones basado en el personaje.
   const evolutionLevels = allEvolutionLevels[character] || allEvolutionLevels.robot;
-  
+
+  // Estado para la imagen actual y para el efecto de evolución.
+  // Usamos "evolved" para controlar si se aplica el efecto extra cuando se alcanza el nivel máximo.
   const [currentImage, setCurrentImage] = useState(evolutionLevels[0].image);
   const [evolved, setEvolved] = useState(false);
 
   useEffect(() => {
-    // Determinamos cuál imagen corresponde al puntaje
     let newImage = evolutionLevels[0].image;
+    let isMax = false;
     evolutionLevels.forEach(level => {
-      if (score >= level.threshold) {
+      if (score >= level.thresholdMin && score <= level.thresholdMax) {
         newImage = level.image;
+        if (level.thresholdMin === 30) {
+          isMax = true;
+        }
       }
     });
-    // Si la imagen cambia, activamos el efecto de brillo
     if (newImage !== currentImage) {
       setCurrentImage(newImage);
-      setEvolved(true);
+      setEvolved(isMax ? 'max' : true);
       const timer = setTimeout(() => {
         setEvolved(false);
-      }, 2000);
+      }, isMax ? 3000 : 2000);
       return () => clearTimeout(timer);
     }
   }, [score, currentImage, evolutionLevels]);
 
   return (
     <div className="profile-container">
-      {/* 
-        'character' es un string (e.g. 'knight' o 'unicorn'). 
-        Si quieres mostrarlo con mayúscula, haz character.charAt(0).toUpperCase() + character.slice(1)
-      */}
-      <h2>{character}</h2>
-
-      <div className={`profile-image ${evolved ? 'shining' : ''}`}>
+      <h2>{character.charAt(0).toUpperCase() + character.slice(1)}</h2>
+      <div className={`profile-image ${evolved === 'max' ? 'max-shining' : evolved ? 'shining' : ''}`}>
         <img src={currentImage} alt="Personaje Evolutivo" />
       </div>
       <p>Puntaje: {score}</p>
