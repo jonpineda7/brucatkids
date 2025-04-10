@@ -222,7 +222,7 @@ body {
     opacity: 0.3;
     transform: scale(1.2);
   }
-
+  
   /* Nueva animación y efectos */
 .super-kid-effects {
     position: absolute;
@@ -344,7 +344,7 @@ body {
       transform: translateX(0);
     }
   }
-
+  
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -493,15 +493,13 @@ body {
 
   .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    display: flex;
+    display: flex; 
+    justify-content: center; 
     align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    z-index: 999;
   }
   
   .modal-content.success {
@@ -528,17 +526,212 @@ body {
   }
   
   .modal-btn {
-    margin-top: 20px;
+    margin: 10px;
     padding: 10px 20px;
     font-size: 18px;
-    background: linear-gradient(45deg, #4CAF50, #2E7D32);
+    background: #ff6f61;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s;
+  }
+
+  .evolve-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
   }
   
-  .modal-btn:hover {
-    background: linear-gradient(45deg, #2E7D32, #1B5E20);
+  .evolve-content {
+    background: #fff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    animation: popIn 0.5s ease;
   }
+  
+  .evolve-content h2 {
+    font-size: 2rem;
+    color: #ff6f61;
+    margin-bottom: 10px;
+  }
+  
+  .evolve-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+  }
+  
+  /* Animación de entrada */
+  @keyframes popIn {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Profile container enhancements */
+  .profile-container {
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  
+  /* Resaltar contorno */
+  .highlight-profile {
+    box-shadow: 0 0 10px rgba(0, 255, 127, 0.7);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  /* Label “PERSONAJE” */
+  .profile-label {
+    color: #2e7d32;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  
+  .profile-name {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .profile-image {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 50%;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  
+  .profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .profile-image.shining {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px 5px rgba(255,215,0,0.8);
+    opacity: 0.9;
+  }
+  
+  .profile-image.max-shining {
+    transform: scale(1.2);
+    box-shadow: 0 0 30px 8px rgba(255,215,0,1);
+    opacity: 0.8;
+  }
+  
+  .profile-container h2 {
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .profile-container p {
+    font-size: 20px;
+    color: #666;
+  }
+
+  /* Score bubble below the character */
+  .profile-score-bubble {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(45deg, #ffeb3b, #ffc107);
+    padding: 8px 16px;
+    border-radius: 50px;
+    box-shadow: 0 4px 10px rgba(255,193,7,0.3);
+    animation: bubblePop 0.5s ease;
+    margin-top: 15px;
+  }
+
+  @keyframes bubblePop {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .score-label {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #333;
+    margin-right: 6px;
+  }
+
+  .score-value {
+    font-size: 1.2rem;
+    color: #d84315;
+    font-weight: bold;
+  }
+
+  /* Listado de juegos */
+.games-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0; /* Ajusta según tu preferencia */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px; /* Espacio entre elementos */
+  }
+  
+  .games-list li {
+    margin: 0; /* Se puede dejar en 0 si ya estás dando margen en .games-list o .games-list li button */
+  }
+  
+  /* Botones dentro de .games-list */
+  .games-list li button {
+    background: linear-gradient(45deg, #ff9800, #ff5722); /* O el degradado que prefieras */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    box-shadow: 3px 3px 12px rgba(0,0,0,0.3);
+  }
+  
+  .games-list li button:hover {
+    background: linear-gradient(45deg, #ff5722, #d84315);
+    transform: scale(1.05);
+  }
+
+.villain-image {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.villain-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

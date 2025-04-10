@@ -10,7 +10,7 @@ const GamesList = ({ category, course, onSelectGame }) => {
     'Tercero Básico': {
       Lenguaje: ['WordPuzzle', 'LetterMatch'],
       Ciencias: ['ScienceQuiz', 'PlantGrowth'],
-      Matemáticas: ['Suma', 'Resta', 'Multiplicación', 'División'],
+      Matemáticas: ['Suma', 'Resta', 'Multiplicación', 'División', 'Comparaciones'],
     },
   };
 
@@ -27,10 +27,13 @@ const GamesList = ({ category, course, onSelectGame }) => {
   return (
     <div>
       <h2>Juegos de {category} en {course}</h2>
-      <ul>
+      {/* Aquí agregamos la clase .games-list */}
+      <ul className="games-list">
         {courseGames.map((game) => (
           <li key={game}>
-            <button onClick={() => handleGameSelect(game)}>{game}</button>
+            <button onClick={() => handleGameSelect(game)}>
+              {game}
+            </button>
           </li>
         ))}
       </ul>

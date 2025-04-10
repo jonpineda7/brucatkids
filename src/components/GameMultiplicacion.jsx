@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import SuccessModal from './SuccessModal';
+import VillainBar from './VillainBar';
+import VillainDefeatedModal from './VillainDefeatedModal';
 
 const totalQuestions = 10;
 const initialLives = 5;
 
-// Modal de Game Over con estilo coherente
+// Modal simple de Game Over
 const GameOverModal = ({ onGameOver }) => (
   <div className="modal-overlay">
     <div className="modal-content">
@@ -17,93 +19,198 @@ const GameOverModal = ({ onGameOver }) => (
   </div>
 );
 
-const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
-  // Etapa actual: "learning" o "challenge"
-  const [stage, setStage] = useState("learning");
-  // Tabla de multiplicar seleccionada
-  const [selectedTable, setSelectedTable] = useState(null);
+// Frases motivadoras
+const motivationalMessages = {
+  Aprendiz: [
+    "¡Excelente! Estás dando tus primeros pasos en la multiplicación. ¡Sigue así!",
+    "¡Maravilloso trabajo! Cada número te lleva a ser mejor.",
+    "¡Multiplicación dominada! Eres un verdadero Aprendiz con gran potencial.",
+  ],
+  Osado: [
+    "¡Genial! Te atreves con más dificultad y lo estás logrando.",
+    "¡Fantástico! Tu osadía te está convirtiendo en un gran experto en la multiplicación.",
+    "¡Increíble! Has resuelto multiplicaciones osadas y sigues avanzando. ¡Adelante!",
+  ],
+  Guerrero: [
+    "¡Impresionante! Has librado la batalla de la multiplicación y has salido victorioso.",
+    "¡Eres un verdadero Guerrero de las matemáticas! Multiplicaciones superadas con fuerza.",
+    "¡Formidable! Nadie detiene tu poder con los números. ¡Sigue conquistando!",
+  ],
+};
 
-  // Estados para la etapa de desafío ("challenge")
+// Función para barajar un array
+function shuffleArray(array) {
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
+  // Control de “learning” o “challenge”
+  const [stage, setStage] = useState("learning");
+  // Tabla seleccionada (1..13) o 14 => “Sorpresa”
+  const [selectedTable, setSelectedTable] = useState(null);
+  // Nivel de dificultad
+  const [difficulty, setDifficulty] = useState(null);
+
+  // Manejo de vidas
   const [lives, setLives] = useState(initialLives);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [lifeLost, setLifeLost] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [gameOverState, setGameOverState] = useState(false);
-  // Controla la aparición del SuccessModal
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lifeLost, setLifeLost] = useState(false);
 
-  // Sonidos de feedback
+  // Villano
+  const [villainHP, setVillainHP] = useState(0);
+  const [villainMaxHP, setVillainMaxHP] = useState(0);
+  const [villainDefeated, setVillainDefeated] = useState(false);
+
+  // Modal final de éxito
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [randomMotivationalMessage, setRandomMotivationalMessage] = useState("");
+
   const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3");
   const correctSound = new Audio("/brucatkids/sounds/correct.mp3");
 
-  // Genera una pregunta para la etapa de desafío
-  const generateQuestion = () => {
-    const factor1 = selectedTable;
-    const factor2 = Math.floor(Math.random() * 13) + 1; // Entre 1 y 13
-    const correctAnswer = factor1 * factor2;
-    setCurrentQuestion({ factor1, factor2, correctAnswer });
-  };
+  const isSorpresaMode = (selectedTable === 14);
 
-  // Mezcla un arreglo (para las opciones de respuesta)
-  const shuffleArray = (array) => {
-    let newArray = array.slice();
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  // Selecciona mensaje motivador al azar
+  function getRandomMotivationalMessage(diff) {
+    const messages = motivationalMessages[diff] || motivationalMessages['Aprendiz'];
+    const index = Math.floor(Math.random() * messages.length);
+    return messages[index];
+  }
+
+  // Generar preguntas
+  function generateQuestion() {
+    if (!isSorpresaMode) {
+      // Tablas 1..13
+      const multiplicand = selectedTable || 1;
+      let maxMultiplier = 10;
+      if (difficulty === 'Osado') maxMultiplier = 20;
+      if (difficulty === 'Guerrero') maxMultiplier = 30;
+
+      const multiplier = Math.floor(Math.random() * maxMultiplier) + 1;
+      const correctAnswer = multiplicand * multiplier;
+      setCurrentQuestion({ multiplicand, multiplier, correctAnswer });
+    } else {
+      // Sorpresa
+      let maxA = 50, maxB = 10;
+      if (difficulty === 'Osado') { maxA = 100; maxB = 20; }
+      if (difficulty === 'Guerrero') { maxA = 300; maxB = 50; }
+      const multiplicand = Math.floor(Math.random() * maxA) + 1;
+      const multiplier = Math.floor(Math.random() * maxB) + 1;
+      const correctAnswer = multiplicand * multiplier;
+      setCurrentQuestion({ multiplicand, multiplier, correctAnswer });
     }
-    return newArray;
-  };
+  }
 
-  // Genera las opciones de respuesta
-  const getAnswerOptions = () => {
-    if (!currentQuestion) return [];
-    const { correctAnswer } = currentQuestion;
-    let option1 = correctAnswer;
-    let option2 = correctAnswer + 1;
-    let option3 = correctAnswer - 1;
-    if (option3 < 0) option3 = correctAnswer + 2;
-    const options = [option1, option2, option3];
-    return shuffleArray(options);
-  };
+  // Definir HP del villano al iniciar challenge
+  useEffect(() => {
+    if (stage === "challenge") {
+      let baseHP;
+      if (isSorpresaMode) {
+        switch (difficulty) {
+          case 'Aprendiz': baseHP = 12; break;
+          case 'Osado': baseHP = 18; break;
+          case 'Guerrero': baseHP = 25; break;
+          default: baseHP = 12;
+        }
+      } else {
+        switch (difficulty) {
+          case 'Aprendiz': baseHP = 10; break;
+          case 'Osado': baseHP = 15; break;
+          case 'Guerrero': baseHP = 20; break;
+          default: baseHP = 10;
+        }
+      }
+      setVillainHP(baseHP);
+      setVillainMaxHP(baseHP);
+      setVillainDefeated(false);
+    }
+  }, [stage, difficulty, isSorpresaMode]);
 
-  // Cuando el stage es "challenge" o se cambia el número de pregunta, generamos una nueva
+  // Generar pregunta cada vez que questionNumber cambie
   useEffect(() => {
     if (stage === "challenge") {
       generateQuestion();
       setLifeLost(false);
       setSelectedOption(null);
     }
-  }, [questionNumber, stage]);
+  }, [questionNumber, stage, difficulty]);
 
-  const handleAnswer = (option) => {
+  // Manejo de respuesta
+  function handleAnswer(option) {
+    if (!currentQuestion) return;
     setSelectedOption(option);
+
     if (option === currentQuestion.correctAnswer) {
       correctSound.play();
       setScore(prev => prev + 1);
+
+      // Daño al villano
+      setVillainHP(prev => {
+        const newHP = prev - 1;
+        if (newHP <= 0) {
+          setVillainDefeated(true);
+          return 0;
+        }
+        return newHP;
+      });
+
       setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
+          const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
+          setRandomMotivationalMessage(msg);
           setShowSuccessModal(true);
         } else {
           setQuestionNumber(prev => prev + 1);
         }
-      }, 1000);
+      }, 800);
     } else {
+      // Respuesta errónea
       wrongAnswerSound.play();
       const newLives = lives - 1;
       setLives(newLives);
       setLifeLost(true);
+
       setTimeout(() => {
         if (newLives <= 0) {
           setGameOverState(true);
         } else {
-          setQuestionNumber(prev => prev + 1);
+          if (questionNumber + 1 >= totalQuestions) {
+            const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
+            setRandomMotivationalMessage(msg);
+            setShowSuccessModal(true);
+          } else {
+            setQuestionNumber(prev => prev + 1);
+          }
         }
-      }, 1000);
+      }, 800);
     }
+  }
+
+  // Cerrar modal de éxito
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    onGameOver();
   };
 
-  const renderHearts = () => {
+  // Villano derrotado
+  const handleVillainDefeatedContinue = () => {
+    setVillainDefeated(false);
+  };
+  const handleVillainDefeatedEnd = () => {
+    setVillainDefeated(false);
+    setShowSuccessModal(true);
+  };
+
+  // Render corazones
+  function renderHearts() {
     const hearts = [];
     for (let i = 0; i < lives; i++) {
       hearts.push(
@@ -116,99 +223,164 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
       );
     }
     return hearts;
-  };
+  }
 
-  // Cierra el SuccessModal y llama a onGameOver
-  const closeSuccessModal = () => {
-    setShowSuccessModal(false);
-    onGameOver();
-  };
+  /**
+   * Obtiene las opciones BARAJADAS
+   */
+  function getShuffledOptions() {
+    if (!currentQuestion) return [];
+    const correctAnswer = currentQuestion.correctAnswer;
+    const alt1 = correctAnswer + 1;
+    const alt2 = correctAnswer - 1;
+
+    let baseOptions = [correctAnswer, alt1, alt2];
+    // Filtramos valores negativos (por si ocurre)
+    baseOptions = baseOptions.filter(opt => opt >= 0);
+    // Evitar duplicados
+    baseOptions = Array.from(new Set(baseOptions));
+
+    // Asegurarnos de 3 opciones
+    while (baseOptions.length < 3) {
+      baseOptions.push(correctAnswer + (Math.random() > 0.5 ? 2 : -2));
+    }
+
+    return shuffleArray(baseOptions);
+  }
 
   let content;
+
+  // ETAPA LEARNING
   if (stage === "learning") {
-    if (!selectedTable) {
-      // Etapa de aprendizaje: explicación de la multiplicación y selección de la tabla
+    if (selectedTable === null) {
+      // Seleccionar tabla 1..13 y “Sorpresa”=14
+      const tables = Array.from({ length: 13 }, (_, i) => i + 1);
       content = (
         <div className="learning-stage">
-          <h2>Aprende la Tabla de Multiplicar</h2>
+          <h2>Seleccionar Tabla o Modo Sorpresa</h2>
           <p className="learning-explanation">
-            La <strong>multiplicación</strong> sirve para sumar un mismo número 
-            varias veces de manera más rápida. Por ejemplo, 3 x 4 equivale a sumar 
-            3 + 3 + 3 + 3, dando como resultado 12.
+            Elige una de las tablas del 1 al 13 o prueba la “Sorpresa Multiplicadora” para desafíos mayores.
           </p>
-          <p>Elige la tabla que quieres aprender:</p>
           <div className="table-options">
-            {Array.from({ length: 13 }, (_, i) => i + 1).map((num) => (
+            {tables.map(num => (
               <button key={num} onClick={() => setSelectedTable(num)}>
                 Tabla del {num}
               </button>
             ))}
+            <button onClick={() => setSelectedTable(14)}>
+              Sorpresa Multiplicadora
+            </button>
           </div>
         </div>
       );
-    } else {
-      // Mostrar la "tabla" de multiplicación
-      const rows = Array.from({ length: 13 }, (_, i) => i + 1);
+    } else if (!difficulty) {
+      // (Se eliminó aquí el botón “Volver” local para evitar duplicados)
       content = (
         <div className="learning-stage">
-          <h2>Tabla del {selectedTable}</h2>
-          <div className="table-grid">
-            {rows.map((num) => (
-              <div key={num} className="table-cell">
-                <span className="table-expression">
-                  {selectedTable} x {num} = {selectedTable * num}
-                </span>
-              </div>
-            ))}
-          </div>
+          {isSorpresaMode ? (
+            <h2>Sorpresa Multiplicadora</h2>
+          ) : (
+            <h2>Tabla del {selectedTable}</h2>
+          )}
           <p className="learning-instruction">
-            ¡Observa cada operación, repítela en voz alta y conviértete en un experto en multiplicar!
+            ¡Excelente! Elige tu nivel de dificultad:
           </p>
-          <button onClick={() => setStage("challenge")} className="next-button">
-            ¡Listo, vamos a jugar!
-          </button>
-          <button onClick={() => setSelectedTable(null)} className="back-button">
-            Volver
-          </button>
+          <div className="table-options">
+            <button onClick={() => setDifficulty('Aprendiz')}>Aprendiz</button>
+            <button onClick={() => setDifficulty('Osado')}>Osado</button>
+            <button onClick={() => setDifficulty('Guerrero')}>Guerrero</button>
+          </div>
         </div>
       );
-    }
-  } else if (stage === "challenge") {
-    if (!currentQuestion) {
-      content = <div>Cargando...</div>;
-    } else if (gameOverState) {
-      content = <GameOverModal onGameOver={onGameOver} />;
     } else {
+      // Vista de aprendizaje (tabla o explicación Sorpresa)
+      if (!isSorpresaMode) {
+        const rows = Array.from({ length: 13 }, (_, i) => i + 1);
+        content = (
+          <div className="learning-stage">
+            <h2>Tabla del {selectedTable}</h2>
+            <p className="difficulty-label">Nivel: {difficulty}</p>
+            <div className="table-grid">
+              {rows.map(num => (
+                <div key={num} className="table-cell">
+                  <span className="table-expression">
+                    {selectedTable} x {num} = {selectedTable * num}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="learning-instruction">
+              Observa la tabla antes de iniciar el desafío.
+            </p>
+            <button onClick={() => setStage("challenge")} className="next-button">
+              ¡Listo, vamos a jugar!
+            </button>
+            <button onClick={() => { setSelectedTable(null); setDifficulty(null); }} className="back-button">
+              Volver
+            </button>
+          </div>
+        );
+      } else {
+        // Modo Sorpresa
+        content = (
+          <div className="learning-stage">
+            <h2>Sorpresa Multiplicadora</h2>
+            <p className="learning-instruction">
+              Se generarán multiplicaciones con números mayores y al azar.
+            </p>
+            <button onClick={() => setStage("challenge")} className="next-button">
+              ¡Listo, vamos a jugar!
+            </button>
+            <button onClick={() => { setSelectedTable(null); setDifficulty(null); }} className="back-button">
+              Volver
+            </button>
+          </div>
+        );
+      }
+    }
+  }
+  // ETAPA CHALLENGE
+  else if (stage === "challenge") {
+    if (gameOverState) {
+      content = <GameOverModal onGameOver={onGameOver} />;
+    } else if (!currentQuestion) {
+      content = <div>Cargando pregunta...</div>;
+    } else {
+      // Obtenemos opciones barajadas
+      const options = getShuffledOptions();
+
       content = (
         <div className="game-container">
           <h2 className="game-title">
-            Desafío: Multiplicación - Tabla del {selectedTable}
+            Desafío: Multiplicación
+            {isSorpresaMode ? ' (Sorpresa)' : ` - Tabla del ${selectedTable}`} ({difficulty})
           </h2>
+
+          {/* Villano */}
+          <VillainBar villainHP={villainHP} villainMaxHP={villainMaxHP} villainNumber={2} />
+
+          {/* Pregunta */}
           <div className="question">
             <p>
-              {currentQuestion.factor1} x {currentQuestion.factor2} = ?
+              {currentQuestion.multiplicand} x {currentQuestion.multiplier} = ?
             </p>
             <div className="answer-buttons">
-              {getAnswerOptions().map((option, index) => (
+              {options.map((opt, i) => (
                 <button
-                  key={index}
-                  onClick={() => handleAnswer(option)}
-                  className={`answer-btn ${
-                    selectedOption === option
-                      ? option === currentQuestion.correctAnswer
-                        ? 'correct'
-                        : 'incorrect'
-                      : ''
-                  }`}
+                  key={i}
+                  onClick={() => handleAnswer(opt)}
+                  className="answer-btn"
                   disabled={selectedOption !== null}
                 >
-                  {option}
+                  {opt}
                 </button>
               ))}
             </div>
           </div>
           <div className="feedback">
-            <div className="hearts">{renderHearts()}</div>
+            <div className="hearts">
+              {renderHearts()}
+            </div>
             <p>Puntaje: {score}</p>
           </div>
         </div>
@@ -219,9 +391,19 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
   return (
     <div>
       {content}
+
+      {/* Modal si el villano se derrotó antes de terminar */}
+      {villainDefeated && !showSuccessModal && !gameOverState && (
+        <VillainDefeatedModal
+          onContinue={handleVillainDefeatedContinue}
+          onEnd={handleVillainDefeatedEnd}
+        />
+      )}
+
+      {/* Modal de éxito al final */}
       {showSuccessModal && (
         <SuccessModal
-          message={`¡Increíble trabajo! Has dominado la tabla del ${selectedTable}. ¡Eres una verdadera estrella de la multiplicación! Sigue practicando y verás cómo cada día te vuelves más fuerte.`}
+          message={randomMotivationalMessage}
           onConfirm={closeSuccessModal}
         />
       )}

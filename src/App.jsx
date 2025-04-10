@@ -7,6 +7,7 @@ import GameSumas from './components/GameSumas';
 import GameRestas from './components/GameRestas';
 import GameMultiplicacion from './components/GameMultiplicacion';
 import GameDivision from './components/GameDivision';
+import GameComparaciones from './components/GameComparaciones';
 import BonusGame from './components/BonusGame'; // Importamos el bonus
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
     } else if (game === 'División') {
       setSelectedGame(
         <GameDivision onGameOver={handleGameOver} score={score} setScore={setScore}  />
+      );
+    } else if (game === 'Comparaciones') {
+      setSelectedGame(
+        <GameComparaciones
+          onGameOver={handleBack}
+          score={score}
+          setScore={setScore}
+        />
       );
     }
   };

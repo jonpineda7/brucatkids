@@ -36,42 +36,49 @@ const allEvolutionLevels = {
 };
 
 const Profile = ({ character, score }) => {
-  // Seleccionamos el conjunto de evoluciones basado en el personaje.
+  // Obtenemos las evoluciones del personaje
   const evolutionLevels = allEvolutionLevels[character] || allEvolutionLevels.robot;
 
-  // Estado para la imagen actual y para el efecto de evolución.
-  // Usamos "evolved" para controlar si se aplica el efecto extra cuando se alcanza el nivel máximo.
+  // Imagen actual y si está en evolución (brillo)
   const [currentImage, setCurrentImage] = useState(evolutionLevels[0].image);
   const [evolved, setEvolved] = useState(false);
 
   useEffect(() => {
     let newImage = evolutionLevels[0].image;
-    let isMax = false;
+    let isMax = false; 
     evolutionLevels.forEach(level => {
       if (score >= level.thresholdMin && score <= level.thresholdMax) {
         newImage = level.image;
         if (level.thresholdMin === 30) {
-          isMax = true;
+          isMax = true; // Evolución máxima
         }
       }
     });
     if (newImage !== currentImage) {
       setCurrentImage(newImage);
       setEvolved(isMax ? 'max' : true);
+
+      // Diferente duración si es la evolución máxima o no
       const timer = setTimeout(() => {
         setEvolved(false);
       }, isMax ? 3000 : 2000);
+
       return () => clearTimeout(timer);
     }
   }, [score, currentImage, evolutionLevels]);
 
   return (
-    <div className="profile-container">
-      <h2>{character.charAt(0).toUpperCase() + character.slice(1)}</h2>
+    <div className="profile-container highlight-profile">
+      <h3 className="profile-label">PERSONAJE</h3>
+      <h2 className="profile-name">{character.charAt(0).toUpperCase() + character.slice(1)}</h2>
       <div className={`profile-image ${evolved === 'max' ? 'max-shining' : evolved ? 'shining' : ''}`}>
         <img src={currentImage} alt="Personaje Evolutivo" />
       </div>
-      <p>Puntaje: {score}</p>
+
+      <div className="profile-score-bubble">
+        <span className="score-label">Puntaje:</span>
+        <span className="score-value">{score}</span>
+      </div>
     </div>
   );
 };
