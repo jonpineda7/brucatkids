@@ -25,6 +25,16 @@ const motivationalMessages = {
   ],
 };
 
+/**
+ * Banco de frases contextuales para problemas de división.
+ * Usa los placeholders {dividend}, {divisor} y {correctAnswer} para insertar valores.
+ */
+const contextTemplates = [
+  "Imagina que tienes {dividend} caramelos y los repartes entre {divisor} amigos. ¿Cuántos recibe cada uno? La respuesta es {correctAnswer}.",
+  "Si divides {dividend} manzanas en {divisor} cestas de forma equitativa, cada cesta tendrá {correctAnswer} manzanas.",
+  "Tienes {dividend} libros y quieres organizarlos en {divisor} estantes iguales. ¿Cuántos libros irán en cada estante? La respuesta es {correctAnswer}.",
+];
+
 const initialLives = 5;
 const totalQuestions = 10;
 
@@ -112,11 +122,22 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
       const quotient = Math.floor(Math.random() * maxQuotient) + 1;
       const dividend = divisor * quotient;
 
-      setCurrentQuestion({
+      const question = {
         dividend,
         divisor,
         correctAnswer: quotient
-      });
+      };
+
+      // Insertar problema contextual si el divisor está entre 2 y 10
+      if (divisor >= 2 && divisor <= 10) {
+        const randomTemplate = contextTemplates[Math.floor(Math.random() * contextTemplates.length)];
+        question.context = randomTemplate
+          .replace('{dividend}', dividend)
+          .replace('{divisor}', divisor)
+          .replace('{correctAnswer}', quotient);
+      }
+
+      setCurrentQuestion(question);
     } else {
       // Modo Sorpresa
       let maxDivisor = 12;
@@ -453,6 +474,7 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
             villainMaxHP={villainMaxHP}
           />
           <div className="question">
+            {currentQuestion.context && <p className="context">{currentQuestion.context}</p>}
             <p>
               {currentQuestion.dividend} ÷ {currentQuestion.divisor} = ?
             </p>

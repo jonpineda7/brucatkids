@@ -119,12 +119,25 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
         maxA = 100; 
         maxB = 80; 
       }
-      const minuendo = Math.floor(Math.random() * maxA) + 10; 
-      const subtrahend = Math.floor(Math.random() * maxB) + 1;
+      let minuendo, subtrahend;
+
+      do {
+        minuendo = Math.floor(Math.random() * (maxA - 10)) + 10; 
+        subtrahend = Math.floor(Math.random() * (maxB - 10)) + 10;
+
+        // Asegura que el minuendo sea menor en las unidades o decenas
+        if (difficulty === 'Osado' || difficulty === 'Guerrero') {
+          const minuendoStr = minuendo.toString();
+          const subtrahendStr = subtrahend.toString();
+          if (minuendoStr[minuendoStr.length - 1] >= subtrahendStr[subtrahendStr.length - 1]) {
+            continue;
+          }
+        }
+      } while (minuendo - subtrahend < 0);
+
       // Asegura que no salga negativo
-      const realMinuendo = Math.max(minuendo, subtrahend + 1);
-      const correctAnswer = realMinuendo - subtrahend;
-      setCurrentQuestion({ minuendo: realMinuendo, subtrahend, correctAnswer });
+      const correctAnswer = minuendo - subtrahend;
+      setCurrentQuestion({ minuendo, subtrahend, correctAnswer });
     }
   }
 

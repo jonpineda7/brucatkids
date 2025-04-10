@@ -109,7 +109,7 @@ function App() {
           <Profile character={character} score={score} />
           {course === null ? (
             <div>
-              <button onClick={() => handleCourseSelect('KINDER')}>KINDER</button>
+              {/* <button onClick={() => handleCourseSelect('KINDER')}>KINDER</button> */}
               <button onClick={() => handleCourseSelect('Tercero Básico')}>Tercero Básico</button>
             </div>
           ) : category === null ? (

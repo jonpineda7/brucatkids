@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 
 /**
- * Devuelve el set de imágenes (normal y dolor) para un villano/boss específico.
+ * Devuelve el set de imágenes (normal y dolor) para un villano/boss específico,
+ * además de un nombre gracioso asociado.
  * villainNumber: 
  *   1..5 => villanos normales
- *   6..8 => bosses (3 jefes)
+ *   6..8 => bosses
  */
-function getVillainImages(villainNumber) {
+function getVillainData(villainNumber) {
   switch (villainNumber) {
     case 1:
       return {
+        name: 'Don Flojera', // Nombre gracioso
         normalHigh: '/brucatkids/images/villano1.png',
         normalMid: '/brucatkids/images/villano1.png',
         normalLow: '/brucatkids/images/villano1.png',
@@ -19,6 +21,7 @@ function getVillainImages(villainNumber) {
       };
     case 2:
       return {
+        name: 'Capitán Pizza Loca',
         normalHigh: '/brucatkids/images/villano2.png',
         normalMid: '/brucatkids/images/villano2.png',
         normalLow: '/brucatkids/images/villano2.png',
@@ -28,6 +31,7 @@ function getVillainImages(villainNumber) {
       };
     case 3:
       return {
+        name: 'El Distraidor',
         normalHigh: '/brucatkids/images/villano3.png',
         normalMid: '/brucatkids/images/villano3.png',
         normalLow: '/brucatkids/images/villano3.png',
@@ -37,6 +41,7 @@ function getVillainImages(villainNumber) {
       };
     case 4:
       return {
+        name: 'Señor Azúcar',
         normalHigh: '/brucatkids/images/villano4.png',
         normalMid: '/brucatkids/images/villano4.png',
         normalLow: '/brucatkids/images/villano4.png',
@@ -46,6 +51,7 @@ function getVillainImages(villainNumber) {
       };
     case 5:
       return {
+        name: 'El Miedito',
         normalHigh: '/brucatkids/images/villano5.png',
         normalMid: '/brucatkids/images/villano5.png',
         normalLow: '/brucatkids/images/villano5.png',
@@ -55,6 +61,7 @@ function getVillainImages(villainNumber) {
       };
     case 6: // boss1
       return {
+        name: 'Mega Aburritón',
         normalHigh: '/brucatkids/images/boss1.png',
         normalMid: '/brucatkids/images/boss1.png',
         normalLow: '/brucatkids/images/boss1.png',
@@ -64,6 +71,7 @@ function getVillainImages(villainNumber) {
       };
     case 7: // boss2
       return {
+        name: 'Capitán Caos',
         normalHigh: '/brucatkids/images/boss2.png',
         normalMid: '/brucatkids/images/boss2.png',
         normalLow: '/brucatkids/images/boss2.png',
@@ -73,6 +81,7 @@ function getVillainImages(villainNumber) {
       };
     case 8: // boss3
       return {
+        name: 'Reina Excusa',
         normalHigh: '/brucatkids/images/boss3.png',
         normalMid: '/brucatkids/images/boss3.png',
         normalLow: '/brucatkids/images/boss3.png',
@@ -81,8 +90,9 @@ function getVillainImages(villainNumber) {
         painLow: '/brucatkids/images/boss3_dolor.png',
       };
     default:
-      // Si no se pasa un número válido, devolvemos villano1 por defecto
+      // Si no se pasa un número válido, devolvemos villano1
       return {
+        name: 'Desconocido',
         normalHigh: '/brucatkids/images/villano1.png',
         normalMid: '/brucatkids/images/villano1.png',
         normalLow: '/brucatkids/images/villano1.png',
@@ -95,39 +105,29 @@ function getVillainImages(villainNumber) {
 
 /**
  * Decide cuál imagen (normal/pain) usar en función del ratio HP.
- * ratio > 0.6 => alto
- * ratio > 0.3 => medio
- * ratio <= 0.3 => bajo
  */
-function getDisplayedImage(villainNumber, ratio, villainInPain) {
-  const {
-    normalHigh, normalMid, normalLow,
-    painHigh, painMid, painLow,
-  } = getVillainImages(villainNumber);
-
+function getDisplayedImage(villainData, ratio, villainInPain) {
   let normalImg, painImg;
+
   if (ratio > 0.6) {
-    normalImg = normalHigh;
-    painImg = painHigh;
+    normalImg = villainData.normalHigh;
+    painImg = villainData.painHigh;
   } else if (ratio > 0.3) {
-    normalImg = normalMid;
-    painImg = painMid;
+    normalImg = villainData.normalMid;
+    painImg = villainData.painMid;
   } else {
-    normalImg = normalLow;
-    painImg = painLow;
+    normalImg = villainData.normalLow;
+    painImg = villainData.painLow;
   }
 
   return villainInPain ? painImg : normalImg;
 }
 
 /**
- * VillainBar
- * - Muestra 5 villanos normales y 3 bosses (villainNumber=1..5 => villano normal, 6..8 => boss).
- * - Cada uno con imagen normal/dolor y barra de vida.
- * - Efecto de sacudida al recibir daño (cuando HP baja).
+ * Muestra al villano/boss con su nombre, imagen, y barra de vida.
  */
 const VillainBar = ({
-  villainNumber = 1, // 1..5 => villanos, 6..8 => bosses
+  villainNumber = 1,  // 1..5 => villanos, 6..8 => bosses
   villainHP,
   villainMaxHP,
 }) => {
@@ -135,7 +135,10 @@ const VillainBar = ({
   const [villainInPain, setVillainInPain] = useState(false);
   const [prevHP, setPrevHP] = useState(villainHP);
 
-  // Detectar si HP bajó => \"dolor\" y \"shake\"
+  // Cargar la data del villano (nombre + imágenes)
+  const villainData = getVillainData(villainNumber);
+
+  // Detectar si HP bajó => animación \"dolor\"
   useEffect(() => {
     if (villainHP < prevHP) {
       setHitEffect(true);
@@ -154,13 +157,17 @@ const VillainBar = ({
   const ratio = villainMaxHP > 0 ? villainHP / villainMaxHP : 0;
   const percentage = Math.max(0, Math.min(ratio * 100, 100));
 
-  // Determinar imagen
-  const displayedImage = getDisplayedImage(villainNumber, ratio, villainInPain);
+  // Determinar imagen a mostrar
+  const displayedImage = getDisplayedImage(villainData, ratio, villainInPain);
+
+  // Etiqueta \"VILLANO\" o \"BOSS\" + nombre
+  const isBoss = (villainNumber > 5);
+  const label = isBoss ? 'BOSS' : 'VILLANO';
 
   return (
     <div className="villain-bar-container highlight-villain">
       <h3 className="villain-label">
-        {villainNumber <= 5 ? 'VILLANO' : 'BOSS'}
+        {label} - {villainData.name}
       </h3>
       <div className={`villain-image ${hitEffect ? 'villain-hit' : ''}`}>
         <img

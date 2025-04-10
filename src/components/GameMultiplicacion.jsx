@@ -55,6 +55,8 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
   const [selectedTable, setSelectedTable] = useState(null);
   // Nivel de dificultad
   const [difficulty, setDifficulty] = useState(null);
+  // Tipo de pregunta
+  const [questionType, setQuestionType] = useState("abstract");
 
   // Manejo de vidas
   const [lives, setLives] = useState(initialLives);
@@ -96,7 +98,16 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
 
       const multiplier = Math.floor(Math.random() * maxMultiplier) + 1;
       const correctAnswer = multiplicand * multiplier;
-      setCurrentQuestion({ multiplicand, multiplier, correctAnswer });
+
+      // Generar preguntas contextuales para tablas 1-10
+      if (selectedTable >= 1 && selectedTable <= 10 && Math.random() > 0.5) {
+        questionType = "contextual";
+        const context = `Si compras ${multiplicand} paquetes con ${multiplier} lápices cada uno, ¿cuántos lápices tienes?`;
+        setCurrentQuestion({ multiplicand, multiplier, correctAnswer, context });
+      } else {
+        questionType = "abstract";
+        setCurrentQuestion({ multiplicand, multiplier, correctAnswer });
+      }
     } else {
       // Sorpresa
       let maxA = 50, maxB = 10;
@@ -361,9 +372,13 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
 
           {/* Pregunta */}
           <div className="question">
-            <p>
-              {currentQuestion.multiplicand} x {currentQuestion.multiplier} = ?
-            </p>
+            {currentQuestion.context ? (
+              <p>{currentQuestion.context}</p>
+            ) : (
+              <p>
+                {currentQuestion.multiplicand} x {currentQuestion.multiplier} = ?
+              </p>
+            )}
             <div className="answer-buttons">
               {options.map((opt, i) => (
                 <button

@@ -130,13 +130,17 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
     let maxRangeA = 20;
     let maxRangeB = 20;
     switch (difficulty) {
+      case 'Aprendiz':
+        maxRangeA = 500; 
+        maxRangeB = 500; 
+        break;
       case 'Osado':
-        maxRangeA = 50; 
-        maxRangeB = 50; 
+        maxRangeA = 750; 
+        maxRangeB = 750; 
         break;
       case 'Guerrero':
-        maxRangeA = 100; 
-        maxRangeB = 100; 
+        maxRangeA = 1000; 
+        maxRangeB = 1000; 
         break;
       default:
         // Aprendiz
