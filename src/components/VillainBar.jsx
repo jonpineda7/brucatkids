@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
  * Devuelve el set de imágenes (normal y dolor) para un villano/boss específico.
  * villainNumber: 
  *   1..5 => villanos normales
- *   6..7 => bosses
+ *   6..8 => bosses (3 jefes)
  */
 function getVillainImages(villainNumber) {
   switch (villainNumber) {
@@ -71,6 +71,15 @@ function getVillainImages(villainNumber) {
         painMid: '/brucatkids/images/boss2_dolor.png',
         painLow: '/brucatkids/images/boss2_dolor.png',
       };
+    case 8: // boss3
+      return {
+        normalHigh: '/brucatkids/images/boss3.png',
+        normalMid: '/brucatkids/images/boss3.png',
+        normalLow: '/brucatkids/images/boss3.png',
+        painHigh: '/brucatkids/images/boss3_dolor.png',
+        painMid: '/brucatkids/images/boss3_dolor.png',
+        painLow: '/brucatkids/images/boss3_dolor.png',
+      };
     default:
       // Si no se pasa un número válido, devolvemos villano1 por defecto
       return {
@@ -113,12 +122,12 @@ function getDisplayedImage(villainNumber, ratio, villainInPain) {
 
 /**
  * VillainBar
- * - Muestra 5 villanos normales y 2 boss (prop villainNumber=1..7).
- * - Cada uno con su estado normal y dolor.
- * - Mantiene la barra de HP y efecto de sacudida cuando recibe daño.
+ * - Muestra 5 villanos normales y 3 bosses (villainNumber=1..5 => villano normal, 6..8 => boss).
+ * - Cada uno con imagen normal/dolor y barra de vida.
+ * - Efecto de sacudida al recibir daño (cuando HP baja).
  */
 const VillainBar = ({
-  villainNumber = 1, // 1..5 => villano normal, 6..7 => boss
+  villainNumber = 1, // 1..5 => villanos, 6..8 => bosses
   villainHP,
   villainMaxHP,
 }) => {
@@ -126,7 +135,7 @@ const VillainBar = ({
   const [villainInPain, setVillainInPain] = useState(false);
   const [prevHP, setPrevHP] = useState(villainHP);
 
-  // Detectar si HP bajó => villano recibe daño
+  // Detectar si HP bajó => \"dolor\" y \"shake\"
   useEffect(() => {
     if (villainHP < prevHP) {
       setHitEffect(true);
@@ -141,11 +150,11 @@ const VillainBar = ({
     setPrevHP(villainHP);
   }, [villainHP, prevHP]);
 
-  // Calculamos el ratio de HP
+  // Calcular ratio
   const ratio = villainMaxHP > 0 ? villainHP / villainMaxHP : 0;
   const percentage = Math.max(0, Math.min(ratio * 100, 100));
 
-  // Determinamos la imagen a mostrar
+  // Determinar imagen
   const displayedImage = getDisplayedImage(villainNumber, ratio, villainInPain);
 
   return (

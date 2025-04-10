@@ -735,3 +735,28 @@ body {
   height: 100%;
   object-fit: contain;
 }
+
+.villain-bar-container {
+    text-align: center;
+    margin: 20px auto;
+    position: relative;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  }
+  
+  .villain-bar {
+    background: #ccc; /* Color base de la barra */
+    width: 200px;
+    height: 20px;
+    border-radius: 5px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .villain-bar-fill {
+    background: linear-gradient(45deg, #ff0000, #b71c1c); /* Rojo */
+    height: 100%;
+    transition: width 0.5s ease;
+  }
