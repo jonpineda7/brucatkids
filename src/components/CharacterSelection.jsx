@@ -8,32 +8,27 @@ function CharacterSelection({ onSelect }) {
   };
 
   return (
-    <div className="characters">
-      <img
-        alt="Robot"
-        src="/brucatkids/images/robot.png"
-        onClick={() => handleCharacterSelect('robot')}
-      />
-      <img
-        alt="Knight"
-        src="/brucatkids/images/knight.png"
-        onClick={() => handleCharacterSelect('knight')}
-      />
-      <img
-        alt="Unicorn"
-        src="/brucatkids/images/unicorn.png"
-        onClick={() => handleCharacterSelect('unicorn')}
-      />
-      <img
-        alt="Astronaut"
-        src="/brucatkids/images/astronaut.png"
-        onClick={() => handleCharacterSelect('astronaut')}
-      />
-      <img
-        alt="Cat"
-        src="/brucatkids/images/cat.png"
-        onClick={() => handleCharacterSelect('cat')}
-      />
+    <div className="character-selection-grid">
+      <div className="character-card" onClick={() => handleCharacterSelect('robot')}>
+        <img alt="Robot" src="/brucatkids/images/robot.png" />
+        <p>Robot</p>
+      </div>
+      <div className="character-card" onClick={() => handleCharacterSelect('knight')}>
+        <img alt="Knight" src="/brucatkids/images/knight.png" />
+        <p>Knight</p>
+      </div>
+      <div className="character-card" onClick={() => handleCharacterSelect('unicorn')}>
+        <img alt="Unicorn" src="/brucatkids/images/unicorn.png" />
+        <p>Unicorn</p>
+      </div>
+      <div className="character-card" onClick={() => handleCharacterSelect('astronaut')}>
+        <img alt="Astronaut" src="/brucatkids/images/astronaut.png" />
+        <p>Astronaut</p>
+      </div>
+      <div className="character-card" onClick={() => handleCharacterSelect('cat')}>
+        <img alt="Cat" src="/brucatkids/images/cat.png" />
+        <p>Cat</p>
+      </div>
     </div>
   );
 }

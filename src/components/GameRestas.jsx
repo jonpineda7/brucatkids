@@ -113,11 +113,11 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
       // Sorpresa => generamos 2 operandos
       let maxA = 30, maxB = 20; 
       if (difficulty === 'Osado') {
-        maxA = 50; 
-        maxB = 40; 
+        maxA = 500; 
+        maxB = 400; 
       } else if (difficulty === 'Guerrero') {
-        maxA = 100; 
-        maxB = 80; 
+        maxA = 1000; 
+        maxB = 900; 
       }
       let minuendo, subtrahend;
 

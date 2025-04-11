@@ -9,6 +9,7 @@ import GameMultiplicacion from './components/GameMultiplicacion';
 import GameDivision from './components/GameDivision';
 import GameComparaciones from './components/GameComparaciones';
 import BonusGame from './components/BonusGame'; // Importamos el bonus
+import GameFracciones from './components/GameFracciones';
 
 function App() {
   const [character, setCharacter] = useState(null);
@@ -59,6 +60,8 @@ function App() {
           setScore={setScore}
         />
       );
+    } else if (game === 'Fracciones') {
+      setSelectedGame(<GameFracciones onGameOver={handleBack} />);
     }
   };
 

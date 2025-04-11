@@ -39,8 +39,8 @@ const GameOverModal = ({ onGameOver }) => (
 
 /**
  * Escoge un símbolo válido según la dificultad:
- *  - Aprendiz => símbolos = [\">\", \"<\", \"=\"] 
- *  - Osado y Guerrero => [\">\", \"<\", \"=\", \"≥\", \"≤\"]
+ *  - Aprendiz => símbolos = [">", "<", "="] 
+ *  - Osado y Guerrero => [">", "<", "=", "≥", "≤"] (≥ y ≤ son para niveles avanzados)
  */
 function getSymbolsByDifficulty(difficulty) {
   if (difficulty === 'Aprendiz') {
@@ -131,21 +131,21 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
     let maxRangeB = 20;
     switch (difficulty) {
       case 'Aprendiz':
-        maxRangeA = 500; 
-        maxRangeB = 500; 
-        break;
-      case 'Osado':
-        maxRangeA = 750; 
-        maxRangeB = 750; 
-        break;
-      case 'Guerrero':
         maxRangeA = 1000; 
         maxRangeB = 1000; 
         break;
+      case 'Osado':
+        maxRangeA = 1000; 
+        maxRangeB = 2000; 
+        break;
+      case 'Guerrero':
+        maxRangeA = 2000; 
+        maxRangeB = 2000; 
+        break;
       default:
         // Aprendiz
-        maxRangeA = 20; 
-        maxRangeB = 20; 
+        maxRangeA = 1000; 
+        maxRangeB = 1000; 
     }
     if (isSorpresaMode) {
       // Aumentamos más si es Sorpresa

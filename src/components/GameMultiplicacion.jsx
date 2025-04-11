@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SuccessModal from './SuccessModal';
 import VillainBar from './VillainBar';
 import VillainDefeatedModal from './VillainDefeatedModal';
+import { speakText } from '../utils/tts';
 
 const totalQuestions = 10;
 const initialLives = 5;
@@ -101,11 +102,11 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
 
       // Generar preguntas contextuales para tablas 1-10
       if (selectedTable >= 1 && selectedTable <= 10 && Math.random() > 0.5) {
-        questionType = "contextual";
+        setQuestionType("contextual");
         const context = `Si compras ${multiplicand} paquetes con ${multiplier} lápices cada uno, ¿cuántos lápices tienes?`;
         setCurrentQuestion({ multiplicand, multiplier, correctAnswer, context });
       } else {
-        questionType = "abstract";
+        setQuestionType("abstract");
         setCurrentQuestion({ multiplicand, multiplier, correctAnswer });
       }
     } else {
@@ -274,11 +275,15 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
           </p>
           <div className="table-options">
             {tables.map(num => (
-              <button key={num} onClick={() => setSelectedTable(num)}>
+              <button key={num} onClick={() => {
+                setSelectedTable(num);
+              }}>
                 Tabla del {num}
               </button>
             ))}
-            <button onClick={() => setSelectedTable(14)}>
+            <button onClick={() => {
+              setSelectedTable(14);
+            }}>
               Sorpresa Multiplicadora
             </button>
           </div>
@@ -313,7 +318,11 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
             <p className="difficulty-label">Nivel: {difficulty}</p>
             <div className="table-grid">
               {rows.map(num => (
-                <div key={num} className="table-cell">
+                <div
+                  key={num}
+                  className="table-cell"
+                  onClick={() => speakText(`${selectedTable} por ${num} es ${selectedTable * num}`)}
+                >
                   <span className="table-expression">
                     {selectedTable} x {num} = {selectedTable * num}
                   </span>

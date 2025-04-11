@@ -10,7 +10,7 @@ const GamesList = ({ category, course, onSelectGame }) => {
     'Tercero Básico': {
       Lenguaje: ['WordPuzzle', 'LetterMatch'],
       Ciencias: ['ScienceQuiz', 'PlantGrowth'],
-      Matemáticas: ['Suma', 'Resta', 'Multiplicación', 'División', 'Comparaciones'],
+      Matemáticas: ['Suma', 'Resta', 'Multiplicación', 'División', 'Comparaciones', 'Fracciones'],
     },
   };
 

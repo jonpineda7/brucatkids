@@ -15,7 +15,7 @@ function shuffleArray(array) {
 const totalQuestions = 10;
 const initialLives = 5;
 
-// Frases motivadoras para la suma
+// Frases motivadoras para la suma/
 const motivationalMessages = {
   Aprendiz: [
     "¡Excelente! Estás dando tus primeros pasos en la suma.",
@@ -156,10 +156,10 @@ const GameSumas = ({ onGameOver, score, setScore }) => {
   }, [questionNumber, stage, difficulty]);
 
   useEffect(() => {
-    if (difficulty) {
+    if (difficulty && mode) {
       setStage("challenge");
     }
-  }, [difficulty]);
+  }, [difficulty, mode]);
 
   /**
    * Baraja las opciones de respuesta para que la correcta no aparezca siempre en la misma posición
@@ -259,13 +259,13 @@ const GameSumas = ({ onGameOver, score, setScore }) => {
         </p>
         <form>
           <div className="table-options">
-            <button type="button" onClick={() => setDifficulty('Aprendiz')}>Aprendiz</button>
-            <button type="button" onClick={() => setDifficulty('Osado')}>Osado</button>
-            <button type="button" onClick={() => setDifficulty('Guerrero')}>Guerrero</button>
+            <button type="button" className={difficulty === 'Aprendiz' ? 'selected-btn' : ''} onClick={() => setDifficulty('Aprendiz')}>Aprendiz</button>
+            <button type="button" className={difficulty === 'Osado' ? 'selected-btn' : ''} onClick={() => setDifficulty('Osado')}>Osado</button>
+            <button type="button" className={difficulty === 'Guerrero' ? 'selected-btn' : ''} onClick={() => setDifficulty('Guerrero')}>Guerrero</button>
           </div>
           <div className="table-options" style={{ marginTop: '20px' }}>
-            <button type="button" onClick={() => setMode(modes.NORMAL)}>Modo Normal</button>
-            <button type="button" onClick={() => setMode(modes.SORPRESA)}>Modo Sorpresa</button>
+            <button type="button" className={mode === modes.NORMAL ? 'selected-btn' : ''} onClick={() => setMode(modes.NORMAL)}>Modo Normal</button>
+            <button type="button" className={mode === modes.SORPRESA ? 'selected-btn' : ''} onClick={() => setMode(modes.SORPRESA)}>Modo Sorpresa</button>
           </div>
         </form>
       </div>

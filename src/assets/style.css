@@ -106,7 +106,7 @@ body {
     animation: superKidEffect 1s infinite;
   }
   
-  @keyframes superKidEffect {
+  @keyframes super-kid-effect {
     0% {
       opacity: 0;
       transform: translate(-50%, -50%) scale(1);
@@ -760,3 +760,59 @@ body {
     height: 100%;
     transition: width 0.5s ease;
   }
+
+.character-selection-title {
+  font-size: 2rem;
+  color: #ff5722;
+  margin-bottom: 20px;
+}
+
+.character-selection-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.character-card {
+  background: #fff8e1;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 10px 20px;
+  width: 150px;
+  transition: transform 0.3s, background-color 0.3s;
+  cursor: pointer;
+  text-align: center;
+}
+
+.character-card:hover {
+  transform: scale(1.1);
+  background-color: #ffe0b2;
+}
+
+.character-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.character-card p {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #d84315;
+  font-size: 1.2rem;
+}
+
+.selected-btn {
+    background: linear-gradient(135deg, #4caf50, #81c784);
+    color: white !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    border: 2px solid #2e7d32;
+  }
+
+img[alt="Pizza"] {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
