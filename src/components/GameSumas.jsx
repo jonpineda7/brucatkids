@@ -1,173 +1,139 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import VillainBar from './VillainBar';
-import SuccessModal from './SuccessModal';
-import VillainDefeatedModal from './VillainDefeatedModal';
+import { useState, useEffect, useRef } from 'react';
+import '../assets/GameSumas.css';
+
+const BRIDGE_PARTS = 5;
+const asset = (name) => `${import.meta.env.BASE_URL}${name}`;
+
+function createQuestion() {
+  const num1 = Math.floor(Math.random() * 9) + 1;
+  const num2 = Math.floor(Math.random() * 9) + 1;
+  const correct = num1 + num2;
+  const answers = new Set([correct]);
+  while (answers.size < 4) answers.add(Math.floor(Math.random() * 19) + 1);
+  const options = [...answers];
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  return { num1, num2, correct, options };
+}
 
 const GameSumas = ({ character, lives, setLives, score, setScore, onGameOver }) => {
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [options, setOptions] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [villainHP, setVillainHP] = useState(5);
-  const [villainMaxHP] = useState(5);
-  const [villainDefeated, setVillainDefeated] = useState(false);
+  const [question, setQuestion] = useState(createQuestion);
+  const [selected, setSelected] = useState(null);
+  const [parts, setParts] = useState(0);
+  const [status, setStatus] = useState('playing');
+  const timer = useRef(null);
+  const locked = useRef(false);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
-  const answerTimer = useRef(null);
-
-  useEffect(() => () => clearTimeout(answerTimer.current), []);
-
-  const safeCharacter = character || "robot";
-
-  const wrongAnswerSound = new Audio("/brucatkids/sounds/life-lost.mp3");
-
-
-  const generateQuestion = useCallback(() => {
-    const num1 = Math.floor(Math.random() * 10);
-    const num2 = Math.floor(Math.random() * 10);
-    const correct = num1 + num2;
-
-    const answers = [correct];
-    while (answers.length < 4) {
-      const wrong = Math.floor(Math.random() * 20);
-      if (!answers.includes(wrong)) answers.push(wrong);
-    }
-
-    setCurrentQuestion({ num1, num2, correct });
-    setOptions(shuffleArray(answers));
-    setSelectedOption(null);
-  }, []);
-
-  useEffect(() => { generateQuestion(); }, [generateQuestion]);
-
-  function shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
+  const playSound = (name) => {
+    new Audio(asset(`sounds/${name}.mp3`)).play().catch(() => {});
   };
 
-  const handleAnswer = (answer) => {
-    if (selectedOption !== null) return;
-    setSelectedOption(answer);
-
-    if (answer === currentQuestion.correct) {
-      setScore(prev => prev + 1);
-      new Audio('/brucatkids/sounds/correct.mp3').play().catch(() => {});
-      const nextHP = Math.max(0, villainHP - 1);
-      setVillainHP(nextHP);
-      if (nextHP === 0) {
-        answerTimer.current = setTimeout(() => setVillainDefeated(true), 1000);
-        return;
-      }
+  const answer = (value) => {
+    if (locked.current || status !== 'playing') return;
+    locked.current = true;
+    setSelected(value);
+    const correct = value === question.correct;
+    if (correct) {
+      setScore(previous => previous + 1);
+      setParts(previous => previous + 1);
+      playSound('correct');
     } else {
-      wrongAnswerSound.play().catch(() => {});
-      const nextLives = Math.max(0, lives - 1);
-      setLives(nextLives);
-      if (nextLives === 0) {
-        answerTimer.current = setTimeout(() => onGameOver(false), 500);
-        return;
+      setLives(previous => Math.max(0, previous - 1));
+      playSound('life-lost');
+    }
+    timer.current = setTimeout(() => {
+      if (correct && parts + 1 === BRIDGE_PARTS) {
+        setStatus('won');
+      } else if (!correct && lives <= 1) {
+        setStatus('lost');
+      } else {
+        setQuestion(createQuestion());
+        setSelected(null);
+        locked.current = false;
       }
-    }
-    answerTimer.current = setTimeout(generateQuestion, 1000);
+    }, correct ? 1400 : 2400);
   };
 
-  const renderHearts = () => {
-    const hearts = [];
-    for (let i = 0; i < 5; i++) {
-      hearts.push(
-        <img
-          key={i}
-          src={`/brucatkids/images/${i < lives ? 'heart_full' : 'heart_empty'}.png`}
-          alt="heart"
-          className="heart-icon"
-        />
-      );
-    }
-    return hearts;
-  };
-
-  function closeSuccessModal() {
-    setShowSuccessModal(false);
-    onGameOver(true);
-  }
-
-  if (!currentQuestion) return null;
-
+  const correct = selected === question.correct;
   return (
-    <div className="game-container p-4">
-      {/* Vista VS estilo arcade */}
-      <div className="versus-intro bg-gradient-to-r from-blue-100 to-pink-100 p-6 rounded-xl border-4 border-yellow-400 mb-6 flex items-center justify-between">
-        <div className="versus-character text-center w-1/3">
-          <img src={`/brucatkids/images/${safeCharacter}.png`} alt="Héroe" className="versus-img mb-2" />
-          <h3 className="text-xl font-bold text-blue-800">{safeCharacter.toUpperCase()}</h3>
-          <div className="flex justify-center mt-2">{renderHearts()}</div>
-        </div>
-        <div className="versus-center w-1/3 text-center">
-          <span className="vs-icon inline-block" aria-label="contra">VS</span>
-        </div>
-        <div className="versus-character text-center w-1/3">
-          <img src="/brucatkids/images/villano2.png" alt="Villano" className="versus-img mb-2" />
-          <h3 className="text-xl font-bold text-red-800">VILLANO</h3>
-          <div className="mt-2">
-            <VillainBar villainNumber={2} villainHP={villainHP} villainMaxHP={villainMaxHP} />
-          </div>
-        </div>
+    <section className="sum-adventure" aria-labelledby="sum-title">
+      <header>
+        <span className="sum-badge">MISIÓN · SUMAS</span>
+        <h2 id="sum-title">¡Enciende el puente!</h2>
+        <p>Junta las dos cargas de energía. Cada suma correcta construye una parte del puente.</p>
+      </header>
+
+      <div className="sum-hud">
+        <span aria-label={`${lives} vidas restantes`}>❤️ {lives}</span>
+        <span>⭐ Puntaje: {score}</span>
+        <span>🌉 {parts} de {BRIDGE_PARTS} partes</span>
       </div>
 
-      {/* Pregunta y opciones */}
-      <div className="question text-center mb-4">
-        <h2 className="text-2xl font-bold mb-2">
-          ¿Cuánto es {currentQuestion.num1} + {currentQuestion.num2}?
-        </h2>
-        <div className="flex justify-center gap-4 flex-wrap">
-          {options.map((opt, index) => (
-            <button
-              key={index}
-              onClick={() => handleAnswer(opt)}
-              disabled={selectedOption !== null || villainDefeated || showSuccessModal}
-              className={`p-3 rounded-xl font-semibold ${
-                selectedOption === opt
-                  ? opt === currentQuestion.correct
-                    ? 'bg-green-300'
-                    : 'bg-red-300'
-                  : 'bg-yellow-200 hover:bg-yellow-300'
-              }`}
-            >
-              {opt}
-            </button>
+      <div className={`sum-scene ${selected !== null && correct ? 'sum-powered' : ''} ${status === 'won' ? 'sum-complete' : ''}`}
+        role="img" aria-label={`Robot construyendo un puente sobre el río: ${parts} de ${BRIDGE_PARTS} partes listas.`}>
+        <span className="sum-sun" aria-hidden="true">☀️</span>
+        <div className="sum-bank sum-bank-left" />
+        <div className="sum-bank sum-bank-right" />
+        <div className="sum-river" />
+        <div className="sum-bridge" aria-hidden="true">
+          {Array.from({ length: BRIDGE_PARTS }, (_, index) => (
+            <span key={index} className={`sum-plank ${index < parts ? 'built' : ''}`} />
           ))}
         </div>
+        <img className="sum-builder" src={asset('images/robot.png')} alt="" />
+        <img className="sum-traveler" src={asset(`images/${character || 'robot'}.png`)} alt="" />
+        <span className="sum-destination" aria-hidden="true">🏡</span>
+        <span className="sum-spark" aria-hidden="true">⚡</span>
+      </div>
+      <div className="sum-energy" role="progressbar" aria-label="Puente construido"
+        aria-valuemin={0} aria-valuemax={BRIDGE_PARTS} aria-valuenow={parts}>
+        <span style={{ width: `${parts / BRIDGE_PARTS * 100}%` }} />
       </div>
 
-      {/* Vidas y puntaje */}
-      <div className="feedback text-center mt-4">
-        <p className="font-bold text-lg">Puntaje: {score}</p>
-      </div>
-
-      {/* Modal de victoria */}
-      {villainDefeated && !showSuccessModal && (
-        <VillainDefeatedModal
-          onContinue={() => {
-            setVillainHP(villainMaxHP);
-            setVillainDefeated(false);
-            generateQuestion();
-          }}
-          onEnd={() => {
-            setVillainDefeated(false);
-            setShowSuccessModal(true);
-          }}
-        />
+      {status === 'playing' ? (
+        <div className="sum-workshop">
+          <h3>¿Cuánta energía tenemos en total?</h3>
+          <div className="sum-packs">
+            {[question.num1, question.num2].map((amount, index) => (
+              <div className="sum-pack-pair" key={index}>
+                {index === 1 && <span className="sum-plus" aria-hidden="true">+</span>}
+                <div className={`sum-pack sum-pack-${index}`} aria-label={`${amount} unidades de energía`}>
+                  <strong>{amount}</strong>
+                  <div aria-hidden="true">{Array.from({ length: amount }, (_, i) => <span key={i}>⚡</span>)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="sum-equation">{question.num1} + {question.num2} = ?</p>
+          <div className="sum-answers" aria-label="Elige la energía total">
+            {question.options.map(value => (
+              <button key={value} onClick={() => answer(value)} disabled={selected !== null}
+                className={selected === value ? (correct ? 'is-correct' : 'is-wrong') : ''}
+                aria-label={`Cargar ${value} unidades de energía`}>
+                <span aria-hidden="true">⚡ </span>{value}
+              </button>
+            ))}
+          </div>
+          <p className="sum-message" role="status" aria-live="polite">
+            {selected === null ? 'Cuenta los rayos y elige la carga para el robot.' : correct
+              ? `¡Energía lista! Construiste la parte ${parts} de ${BRIDGE_PARTS}.`
+              : `Sigamos practicando: ${question.num1} + ${question.num2} = ${question.correct}. Puedes contar los rayos de las dos cargas.`}
+          </p>
+        </div>
+      ) : (
+        <div className="sum-result" role="status">
+          <h3>{status === 'won' ? '¡Puente encendido! 🎉' : '¡Buen esfuerzo, constructor!'}</h3>
+          <p>{status === 'won' ? '¡Tu compañero ya puede cruzar y llegar a casa! Lo lograste sumando energía.'
+            : `Construiste ${parts} de ${BRIDGE_PARTS} partes. Podemos volver a practicar.`}</p>
+          <button onClick={() => onGameOver(status === 'won')}>
+            {status === 'won' ? '¡Misión completada!' : 'Volver a los juegos'}
+          </button>
+        </div>
       )}
-
-      {showSuccessModal && (
-        <SuccessModal
-          message="¡Buen trabajo, lo lograste!"
-          onConfirm={closeSuccessModal}
-        />
-      )}
-    </div>
+    </section>
   );
 };
 
