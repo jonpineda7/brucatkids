@@ -49,6 +49,8 @@ const Profile = ({ character, score, compact = false }) => {
     return () => clearTimeout(timer);
   }, [currentImage, level.thresholdMin]);
 
+  const nextLevel = evolutionLevels.find(item => item.thresholdMin > score);
+
   return (
     <div className={`profile-container ${compact ? 'compact-profile' : 'highlight-profile'}`}>
       {!compact && <h3 className="profile-label">PERSONAJE</h3>}
@@ -61,6 +63,9 @@ const Profile = ({ character, score, compact = false }) => {
         <img src={currentImage} alt="Personaje Evolutivo" />
       </div>
 
+      <p className="evolution-status" role="status" aria-live="polite">
+        {evolved ? '✨ ¡Tu personaje evolucionó!' : nextLevel ? `A ${nextLevel.thresholdMin - score} puntos de evolucionar` : '✨ Evolución máxima'}
+      </p>
       <div className="profile-score-bubble">
         <span className="score-label">Puntaje:</span>
         <span className="score-value">{score}</span>

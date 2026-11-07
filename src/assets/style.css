@@ -875,3 +875,42 @@ img[alt="Pizza"] {
     filter: drop-shadow(0 0 20px #ff0);
   }
 }
+/* Arena compartida: héroe y rival dentro del mismo desafío. */
+.is-playing { color: #24394c; }
+.is-playing .game-container { margin: 0; padding: 18px; background: #f3f8ff; }
+.is-playing .game-title { font-size: clamp(1.15rem, 3.5vw, 1.6rem); margin: 0 0 14px; color: #304c74; }
+.battle-arena { display: grid; grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr); align-items: stretch; gap: 12px; margin: 12px 0 18px; }
+.battle-arena .profile-container, .battle-arena .villain-bar-container { box-sizing: border-box; width: 100%; margin: 0; padding: 12px 8px; border-radius: 18px; box-shadow: none; background: white; border: 2px solid #b8ddda; min-width: 0; }
+.battle-arena .villain-bar-container { border-color: #f0c6c8; background: #fff6f5; }
+.battle-vs { align-self: center; font-weight: 900; color: #a56a23; }
+.battle-arena .profile-image, .battle-arena .villain-image { width: clamp(64px, 12vh, 110px); height: clamp(64px, 12vh, 110px); margin: 4px auto 8px; overflow: visible; box-shadow: none; }
+.battle-arena .profile-image img { object-fit: contain; }
+.battle-arena .villain-label { font-size: .85rem; margin: 0 0 8px; min-height: 22px; }
+.battle-arena .villain-bar { width: min(160px, 90%); height: 12px; }
+.battle-arena .villain-bar-hp { font-size: .8rem; margin-top: 5px; }
+.battle-arena .profile-score-bubble { margin: 4px auto 0; padding: 5px 10px; font-size: .85rem; }
+.battle-arena .evolution-status { font-size: .8rem; font-weight: 700; color: #23604f; margin: 6px 0; min-height: 2.4em; }
+.is-playing .question p { font-size: clamp(1.15rem, 3.5vw, 1.7rem); margin: 12px 0; line-height: 1.4; }
+.is-playing .answer-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+.is-playing .answer-buttons button { margin: 0; min-height: 52px; min-width: 70px; padding: 12px 18px; font-size: 1.25rem; }
+.is-playing .feedback { margin: 12px 0 0; font-size: 1rem; }
+.is-playing .feedback p { margin: 8px 0 0; }
+.is-playing .heart-icon { width: 26px; height: 26px; }
+.is-playing > .back-button { margin: 14px 0 0; padding: 10px 22px; font-size: 1rem; }
+.sum-adventure .battle-arena { margin-bottom: 10px; }
+.sum-adventure .sum-scene { height: clamp(130px, 22vh, 200px); }
+.sum-adventure .sum-hud { margin: 10px 0; }
+.sum-adventure .sum-workshop h3 { margin: 10px 0; }
+.sum-adventure .sum-energy { margin: 10px 0; }
+.sum-adventure .sum-equation { margin: 8px 0; }
+.modal-overlay { padding: 16px; box-sizing: border-box; overflow-y: auto; }
+.modal-overlay .modal-content { max-height: calc(100dvh - 64px); overflow-y: auto; box-sizing: border-box; }
+@media (max-width: 520px) {
+  #app { padding: 10px; }
+  .is-playing .game-container { padding: 12px; }
+  .battle-arena { gap: 6px; grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr); }
+  .battle-arena .villain-label { font-size: .75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-playing *, .is-playing *::before, .is-playing *::after { animation: none !important; transition: none !important; }
+}

@@ -1,10 +1,10 @@
+import Profile from './Profile';
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import SuccessModal from './SuccessModal';
 import VillainBar from './VillainBar';
 import VillainDefeatedModal from './VillainDefeatedModal';
 import { speakText } from '../utils/tts';
 
-const totalQuestions = 10;
 const initialLives = 5;
 
 // Modal simple de Game Over
@@ -49,7 +49,7 @@ function shuffleArray(array) {
   return arr;
 }
 
-const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
+const GameMultiplicacion = ({ character, onGameOver, score, setScore }) => {
   const answerTimer = useRef(null);
   useEffect(() => () => clearTimeout(answerTimer.current), []);
   // Control de “learning” o “challenge”
@@ -177,16 +177,13 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
       // Daño al villano
       const nextHP = Math.max(0, villainHP - 1);
       setVillainHP(nextHP);
-      if (nextHP === 0) setVillainDefeated(true);
+      if (nextHP === 0) {
+        answerTimer.current = setTimeout(() => setVillainDefeated(true), 900);
+        return;
+      }
 
       answerTimer.current = setTimeout(() => {
-        if (questionNumber + 1 >= totalQuestions) {
-          const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
-          setRandomMotivationalMessage(msg);
-          setShowSuccessModal(true);
-        } else {
-          setQuestionNumber(prev => prev + 1);
-        }
+        setQuestionNumber(prev => prev + 1);
       }, 800);
     } else {
       // Respuesta errónea
@@ -199,13 +196,7 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
         if (newLives <= 0) {
           setGameOverState(true);
         } else {
-          if (questionNumber + 1 >= totalQuestions) {
-            const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
-            setRandomMotivationalMessage(msg);
-            setShowSuccessModal(true);
-          } else {
-            setQuestionNumber(prev => prev + 1);
-          }
+          setQuestionNumber(prev => prev + 1);
         }
       }, 800);
     }
@@ -219,9 +210,12 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
 
   // Villano derrotado
   const handleVillainDefeatedContinue = () => {
+    setVillainHP(villainMaxHP);
+    setQuestionNumber(prev => prev + 1);
     setVillainDefeated(false);
   };
   const handleVillainDefeatedEnd = () => {
+    setRandomMotivationalMessage(getRandomMotivationalMessage(difficulty || 'Aprendiz'));
     setVillainDefeated(false);
     setShowSuccessModal(true);
   };
@@ -351,7 +345,7 @@ const GameMultiplicacion = ({ onGameOver, score, setScore }) => {
           </h2>
 
           {/* Villano */}
-          <VillainBar villainHP={villainHP} villainMaxHP={villainMaxHP} villainNumber={2} />
+          <div className="battle-arena"><Profile character={character} score={score} compact /><span className="battle-vs" aria-hidden="true">VS</span><VillainBar villainHP={villainHP} villainMaxHP={villainMaxHP} villainNumber={2} /></div>
 
           {/* Pregunta */}
           <div className="question">

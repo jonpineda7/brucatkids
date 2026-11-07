@@ -1,9 +1,9 @@
+import Profile from './Profile';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import SuccessModal from './SuccessModal';
 import VillainBar from './VillainBar';
 import VillainDefeatedModal from './VillainDefeatedModal';
 
-const totalQuestions = 10;
 const initialLives = 5;
 
 const motivationalMessages = {
@@ -39,7 +39,7 @@ const GameOverModal = ({ onGameOver }) => (
 
 /**
  * Escoge un símbolo válido según la dificultad:
- *  - Aprendiz => símbolos = [">", "<", "="] 
+ *  - Aprendiz => símbolos = [">", "<", "="]
  *  - Osado y Guerrero => [">", "<", "=", "≥", "≤"] (≥ y ≤ son para niveles avanzados)
  */
 function getSymbolsByDifficulty(difficulty) {
@@ -57,7 +57,7 @@ function getRandomInt(range) {
   return Math.floor(Math.random() * range) + 1;
 }
 
-const GameComparaciones = ({ onGameOver, score, setScore }) => {
+const GameComparaciones = ({ character, onGameOver, score, setScore }) => {
   function getRandomMotivationalMessage(diff) {
     const messages = motivationalMessages[diff] || motivationalMessages.Aprendiz;
     return messages[Math.floor(Math.random() * messages.length)];
@@ -100,21 +100,21 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
     let maxRangeB = 20;
     switch (difficulty) {
       case 'Aprendiz':
-        maxRangeA = 1000; 
-        maxRangeB = 1000; 
+        maxRangeA = 1000;
+        maxRangeB = 1000;
         break;
       case 'Osado':
-        maxRangeA = 1000; 
-        maxRangeB = 2000; 
+        maxRangeA = 1000;
+        maxRangeB = 2000;
         break;
       case 'Guerrero':
-        maxRangeA = 2000; 
-        maxRangeB = 2000; 
+        maxRangeA = 2000;
+        maxRangeB = 2000;
         break;
       default:
         // Aprendiz
-        maxRangeA = 1000; 
-        maxRangeB = 1000; 
+        maxRangeA = 1000;
+        maxRangeB = 1000;
     }
     if (isSorpresaMode) {
       // Aumentamos más si es Sorpresa
@@ -134,9 +134,9 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
     const isTrue = evaluateComparison(a, b, symbol);
 
     setCurrentQuestion({
-      a, 
-      b, 
-      symbol, 
+      a,
+      b,
+      symbol,
       // Este boolean indica si la afirmación \"a symbol b\" es verdadera
       isTrueCorrect: isTrue
     });
@@ -205,16 +205,13 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
       // Quitar HP al villano
       const nextHP = Math.max(0, villainHP - 1);
       setVillainHP(nextHP);
-      if (nextHP === 0) setVillainDefeated(true);
+      if (nextHP === 0) {
+        answerTimer.current = setTimeout(() => setVillainDefeated(true), 900);
+        return;
+      }
 
       answerTimer.current = setTimeout(() => {
-        if (questionNumber + 1 >= totalQuestions) {
-          const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
-          setRandomMotivationalMessage(msg);
-          setShowSuccessModal(true);
-        } else {
-          setQuestionNumber(prev => prev + 1);
-        }
+        setQuestionNumber(prev => prev + 1);
       }, 800);
     } else {
       wrongAnswerSound.play().catch(() => {});
@@ -226,13 +223,7 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
         if (newLives <= 0) {
           setGameOverState(true);
         } else {
-          if (questionNumber + 1 >= totalQuestions) {
-            const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
-            setRandomMotivationalMessage(msg);
-            setShowSuccessModal(true);
-          } else {
-            setQuestionNumber(prev => prev + 1);
-          }
+          setQuestionNumber(prev => prev + 1);
         }
       }, 800);
     }
@@ -242,9 +233,12 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
 
   // Villano derrotado
   const handleVillainDefeatedContinue = () => {
+    setVillainHP(villainMaxHP);
+    setQuestionNumber(prev => prev + 1);
     setVillainDefeated(false);
   };
   const handleVillainDefeatedEnd = () => {
+    setRandomMotivationalMessage(getRandomMotivationalMessage(difficulty || 'Aprendiz'));
     setVillainDefeated(false);
     setShowSuccessModal(true);
   };
@@ -264,10 +258,10 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
           <h2>Aprende las Comparaciones</h2>
           <p className="learning-explanation">
             Conoce los símbolos:<br />
-            <strong>&gt;</strong> (mayor), 
-            <strong>&lt;</strong> (menor), 
-            <strong>=</strong> (igual), 
-            <strong>≥</strong> (mayor o igual), 
+            <strong>&gt;</strong> (mayor),
+            <strong>&lt;</strong> (menor),
+            <strong>=</strong> (igual),
+            <strong>≥</strong> (mayor o igual),
             <strong>≤</strong> (menor o igual).
           </p>
           <p className="learning-instruction">
@@ -379,11 +373,11 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
             }
           </h2>
           {/* Villano */}
-          <VillainBar 
-            villainNumber={4} 
-            villainHP={villainHP} 
-            villainMaxHP={villainMaxHP} 
-          />
+          <div className="battle-arena"><Profile character={character} score={score} compact /><span className="battle-vs" aria-hidden="true">VS</span><VillainBar
+            villainNumber={4}
+            villainHP={villainHP}
+            villainMaxHP={villainMaxHP}
+          /></div>
           <div className="question">
             <p>
               {currentQuestion.a} {currentQuestion.symbol} {currentQuestion.b} ¿Es correcto?

@@ -91,7 +91,7 @@ function App() {
   };
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${selectedGame ? 'is-playing' : ''}`}>
       {character === null ? (
         <div className="welcome-screen">
           <h1>¡Bienvenidos a BruCat Kids!</h1>
@@ -100,7 +100,7 @@ function App() {
         </div>
       ) : (
         <>
-          {selectedGame !== 'Suma' && <Profile character={character} score={score} />}
+          {!selectedGame && <Profile character={character} score={score} />}
           {bonusActive ? (
             <BonusGame onComplete={handleBonusComplete} />
           ) : course === null ? (

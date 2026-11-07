@@ -1,3 +1,6 @@
+import Profile from './Profile';
+import VillainBar from './VillainBar';
+import VillainDefeatedModal from './VillainDefeatedModal';
 import { useState, useEffect, useRef } from 'react';
 import '../assets/GameSumas.css';
 
@@ -23,6 +26,7 @@ const GameSumas = ({ character, lives, setLives, score, setScore, onGameOver }) 
   const [selected, setSelected] = useState(null);
   const [parts, setParts] = useState(0);
   const [status, setStatus] = useState('playing');
+  const [defeated, setDefeated] = useState(false);
   const timer = useRef(null);
   const locked = useRef(false);
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -47,6 +51,7 @@ const GameSumas = ({ character, lives, setLives, score, setScore, onGameOver }) 
     timer.current = setTimeout(() => {
       if (correct && parts + 1 === BRIDGE_PARTS) {
         setStatus('won');
+        setDefeated(true);
       } else if (!correct && lives <= 1) {
         setStatus('lost');
       } else {
@@ -66,6 +71,11 @@ const GameSumas = ({ character, lives, setLives, score, setScore, onGameOver }) 
         <p>Junta las dos cargas de energía. Cada suma correcta construye una parte del puente.</p>
       </header>
 
+      <div className="battle-arena">
+        <Profile character={character} score={score} compact />
+        <span className="battle-vs" aria-hidden="true">VS</span>
+        <VillainBar villainNumber={2} villainHP={BRIDGE_PARTS - parts} villainMaxHP={BRIDGE_PARTS} />
+      </div>
       <div className="sum-hud">
         <span aria-label={`${lives} vidas restantes`}>❤️ {lives}</span>
         <span>⭐ Puntaje: {score}</span>
@@ -133,6 +143,14 @@ const GameSumas = ({ character, lives, setLives, score, setScore, onGameOver }) 
           </button>
         </div>
       )}
+      {defeated && <VillainDefeatedModal onEnd={() => setDefeated(false)} onContinue={() => {
+        setDefeated(false);
+        setParts(0);
+        setStatus('playing');
+        setSelected(null);
+        setQuestion(createQuestion());
+        locked.current = false;
+      }} />}
     </section>
   );
 };
