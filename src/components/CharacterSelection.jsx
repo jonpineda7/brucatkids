@@ -9,26 +9,26 @@ function CharacterSelection({ onSelect }) {
 
   return (
     <div className="character-selection-grid">
-      <div className="character-card" onClick={() => handleCharacterSelect('robot')}>
+      <button type="button" className="character-card" onClick={() => handleCharacterSelect('robot')}>
         <img alt="Robot" src="/brucatkids/images/robot.png" />
         <p>Robot</p>
-      </div>
-      <div className="character-card" onClick={() => handleCharacterSelect('knight')}>
+      </button>
+      <button type="button" className="character-card" onClick={() => handleCharacterSelect('knight')}>
         <img alt="Knight" src="/brucatkids/images/knight.png" />
         <p>Knight</p>
-      </div>
-      <div className="character-card" onClick={() => handleCharacterSelect('unicorn')}>
+      </button>
+      <button type="button" className="character-card" onClick={() => handleCharacterSelect('unicorn')}>
         <img alt="Unicorn" src="/brucatkids/images/unicorn.png" />
         <p>Unicorn</p>
-      </div>
-      <div className="character-card" onClick={() => handleCharacterSelect('astronaut')}>
+      </button>
+      <button type="button" className="character-card" onClick={() => handleCharacterSelect('astronaut')}>
         <img alt="Astronaut" src="/brucatkids/images/astronaut.png" />
         <p>Astronaut</p>
-      </div>
-      <div className="character-card" onClick={() => handleCharacterSelect('cat')}>
+      </button>
+      <button type="button" className="character-card" onClick={() => handleCharacterSelect('cat')}>
         <img alt="Cat" src="/brucatkids/images/cat.png" />
         <p>Cat</p>
-      </div>
+      </button>
     </div>
   );
 }

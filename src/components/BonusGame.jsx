@@ -1,3 +1,4 @@
+import '../assets/BonusGame.css';
 import React, { useState, useEffect } from 'react';
 
 const BonusGame = ({ onComplete }) => {

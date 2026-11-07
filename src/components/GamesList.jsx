@@ -1,5 +1,9 @@
 import React from 'react';
 
+const removeAccents = (str) => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
 const GamesList = ({ category, course, onSelectGame }) => {
   const games = {
     KINDER: {
@@ -27,16 +31,14 @@ const GamesList = ({ category, course, onSelectGame }) => {
   return (
     <div>
       <h2>Juegos de {category} en {course}</h2>
-      {/* Aquí agregamos la clase .games-list */}
-      <ul className="games-list">
+      <div className="games-grid">
         {courseGames.map((game) => (
-          <li key={game}>
-            <button onClick={() => handleGameSelect(game)}>
-              {game}
-            </button>
-          </li>
+          <button type="button" key={game} className="game-card" onClick={() => handleGameSelect(game)}>
+            <img src={`/brucatkids/images/icon_${removeAccents(game.toLowerCase())}.png`} alt={game} className="game-icon" />
+            <span>{game}</span>
+          </button>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

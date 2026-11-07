@@ -36,39 +36,29 @@ function App() {
   };
 
   const handleGameSelect = (game) => {
-    if (game === 'Suma') {
-      setSelectedGame(
-        <GameSumas onGameOver={handleGameOver} score={score} setScore={setScore} />
-      );
-    } else if (game === 'Resta') {
-      setSelectedGame(
-        <GameRestas onGameOver={handleGameOver} score={score} setScore={setScore}  />
-      );
-    } else if (game === 'Multiplicación') {
-      setSelectedGame(
-        <GameMultiplicacion onGameOver={handleGameOver} score={score} setScore={setScore}  />
-      );
-    } else if (game === 'División') {
-      setSelectedGame(
-        <GameDivision onGameOver={handleGameOver} score={score} setScore={setScore}  />
-      );
-    } else if (game === 'Comparaciones') {
-      setSelectedGame(
-        <GameComparaciones
-          onGameOver={handleBack}
-          score={score}
-          setScore={setScore}
-        />
-      );
-    } else if (game === 'Fracciones') {
-      setSelectedGame(<GameFracciones onGameOver={handleBack} />);
-    }
+    setLives(5);
+    setSelectedGame(game);
   };
+
+  const gameComponents = {
+    Suma: GameSumas,
+    Resta: GameRestas,
+    Multiplicación: GameMultiplicacion,
+    División: GameDivision,
+    Comparaciones: GameComparaciones,
+    Fracciones: GameFracciones,
+  };
+  const SelectedGame = gameComponents[selectedGame];
 
   // Esta función se invoca cuando finaliza un juego
   // Puedes definir en el juego si fue ganado o no y, según eso, actualizar la racha.
   // Aquí supongamos que onGameOver se llama al finalizar el juego.
-  const handleGameOver = () => {
+  const handleGameOver = (won = true) => {
+    if (!won) {
+      setStreak(0);
+      setSelectedGame(null);
+      return;
+    }
     // Aquí podrías evaluar si el juego se ganó (por ejemplo, si score aumentó o si se cumplió cierto criterio)
     // Para simplificar, supongamos que si se terminó el juego sin game over interno, aumentamos la racha.
     setStreak(prev => prev + 1);
@@ -89,6 +79,7 @@ function App() {
 
   const handleBack = () => {
     if (selectedGame) {
+      setStreak(0);
       setSelectedGame(null);
     } else if (category) {
       setCategory(null);
@@ -100,7 +91,7 @@ function App() {
   };
 
   return (
-    <div id="app">
+    <div className="app-shell">
       {character === null ? (
         <div className="welcome-screen">
           <h1>¡Bienvenidos a BruCat Kids!</h1>
@@ -109,8 +100,10 @@ function App() {
         </div>
       ) : (
         <>
-          <Profile character={character} score={score} />
-          {course === null ? (
+          {selectedGame !== 'Suma' && <Profile character={character} score={score} />}
+          {bonusActive ? (
+            <BonusGame onComplete={handleBonusComplete} />
+          ) : course === null ? (
             <div>
               {/* <button onClick={() => handleCourseSelect('KINDER')}>KINDER</button> */}
               <button onClick={() => handleCourseSelect('Tercero Básico')}>Tercero Básico</button>
@@ -120,14 +113,18 @@ function App() {
           ) : selectedGame === null ? (
             <GamesList category={category} course={course} onSelectGame={handleGameSelect} />
           ) : (
-            <div>{selectedGame}</div>
+            <SelectedGame
+              character={character}
+              lives={lives}
+              setLives={setLives}
+              score={score}
+              setScore={setScore}
+              onGameOver={handleGameOver}
+            />
           )}
 
-          {bonusActive && (
-            <BonusGame onComplete={handleBonusComplete} />
-          )}
 
-          {character && (course || category || selectedGame) && (
+          {!bonusActive && character && (course || category || selectedGame) && (
             <button onClick={handleBack} className="back-button">Volver</button>
           )}
         </>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 function BalloonPopMaths({ score, lives, onIncrementScore, onDecrementLives }) {
-  const [balloons, setBalloons] = useState([]);
   const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {

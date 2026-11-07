@@ -3,7 +3,7 @@ import React from 'react';
 
 const categories = {
     KINDER: ['Matemáticas', 'Colores', 'Memoria'],
-    'Tercero Básico': ['Matemáticas', 'Lenguaje', 'Ciencias'],
+    'Tercero Básico': ['Matemáticas'],
   };
   
 
@@ -12,7 +12,7 @@ const CategorySelection = ({ course, onSelectCategory }) => {
     <div>
       <h2>Categorías de {course}</h2>
       <ul>
-        {categories[course].map((category) => (
+        {(categories[course] || []).map((category) => (
           <li key={category}>
             <button onClick={() => onSelectCategory(category)}>{category}</button>
           </li>

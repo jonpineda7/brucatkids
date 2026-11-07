@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import SuccessModal from './SuccessModal';
 
 const initialLives = 5;
@@ -6,18 +6,19 @@ const fraccionesSimples = [
   { label: '1/2', value: 0.5 },
   { label: '1/3', value: 1 / 3 },
   { label: '1/4', value: 0.25 },
-  { label: '2/3', value: 2 / 3 },
   { label: '3/4', value: 0.75 },
 ];
 
 const totalQuestions = 6;
 
-const GameFracciones = ({ onGameOver }) => {
+const GameFracciones = ({ onGameOver, setScore: setTotalScore }) => {
+  const answerTimer = useRef(null);
+  useEffect(() => () => clearTimeout(answerTimer.current), []);
   const [stage, setStage] = useState('learning');
   const [questionNumber, setQuestionNumber] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(initialLives);
-  const [currentQuestion, setCurrentQuestion] = useState(generateQuestion());
+  const [currentQuestion, setCurrentQuestion] = useState(generateQuestion);
   const [selected, setSelected] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
@@ -36,40 +37,32 @@ const GameFracciones = ({ onGameOver }) => {
   }
 
   const handleAnswer = (selectedOption) => {
+    if (selected || showSuccessModal || showGameOver) return;
     setSelected(selectedOption);
     const isCorrect = selectedOption.label === currentQuestion.correct.label;
+    const nextLives = lives - (isCorrect ? 0 : 1);
     if (isCorrect) {
       setScore(prev => prev + 1);
-      setTimeout(() => {
-        if (questionNumber + 1 >= totalQuestions) {
-          setShowSuccessModal(true);
-        } else {
-          setQuestionNumber(prev => prev + 1);
-          setCurrentQuestion(generateQuestion());
-          setSelected(null);
-        }
-      }, 800);
-    } else {
-      const newLives = lives - 1;
-      setLives(newLives);
-      setTimeout(() => {
-        if (newLives <= 0) {
-          setShowGameOver(true);
-        } else {
-          setQuestionNumber(prev => prev + 1);
-          setCurrentQuestion(generateQuestion());
-          setSelected(null);
-        }
-      }, 800);
+      setTotalScore(prev => prev + 1);
     }
+    setLives(nextLives);
+    answerTimer.current = setTimeout(() => {
+      if (nextLives <= 0) setShowGameOver(true);
+      else if (questionNumber + 1 >= totalQuestions) setShowSuccessModal(true);
+      else {
+        setQuestionNumber(prev => prev + 1);
+        setCurrentQuestion(generateQuestion());
+        setSelected(null);
+      }
+    }, 800);
   };
 
   if (showSuccessModal) {
-    return <SuccessModal message={"¡Felicidades! Eres un maestro de las fracciones."} onConfirm={onGameOver} />;
+    return <SuccessModal message={"¡Felicidades! Eres un maestro de las fracciones."} onConfirm={() => onGameOver(true)} />;
   }
 
   if (showGameOver) {
-    return <GameOverModal onGameOver={onGameOver} />;
+    return <div className="learning-stage"><h2>¡Sigue practicando!</h2><p>Se terminaron las vidas.</p><button onClick={() => onGameOver(false)}>Volver a los juegos</button></div>;
   }
 
   if (stage === 'learning') {

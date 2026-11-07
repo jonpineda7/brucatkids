@@ -690,37 +690,43 @@ body {
   }
 
   /* Listado de juegos */
-.games-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 20px 0; /* Ajusta según tu preferencia */
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px; /* Espacio entre elementos */
-  }
-  
-  .games-list li {
-    margin: 0; /* Se puede dejar en 0 si ya estás dando margen en .games-list o .games-list li button */
-  }
-  
-  /* Botones dentro de .games-list */
-  .games-list li button {
-    background: linear-gradient(45deg, #ff9800, #ff5722); /* O el degradado que prefieras */
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 50px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.3s;
-    box-shadow: 3px 3px 12px rgba(0,0,0,0.3);
-  }
-  
-  .games-list li button:hover {
-    background: linear-gradient(45deg, #ff5722, #d84315);
-    transform: scale(1.05);
-  }
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  padding: 0;
+  margin: 30px auto;
+  list-style: none;
+  max-width: 800px;
+}
+
+.game-card {
+  background: #fff8e1;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 15px 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.game-card:hover {
+  transform: scale(1.05);
+  background-color: #ffe0b2;
+}
+
+.game-card img.game-icon {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.game-card h3 {
+  font-size: 1.2rem;
+  color: #ff5722;
+  margin: 0;
+}
 
 .villain-image {
   width: 120px;
@@ -815,4 +821,57 @@ body {
 img[alt="Pizza"] {
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.versus-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  border: 5px solid #ffcc00;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.versus-character {
+  color: #fff;
+  text-align: center;
+  width: 40%;
+}
+
+.versus-character h3 {
+  font-family: 'ArcadeClassic', sans-serif;
+  font-size: 2rem;
+  margin-top: 10px;
+  text-shadow: 2px 2px #000;
+}
+
+.versus-img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ff0000;
+}
+
+.versus-center {
+  width: 20%;
+  text-align: center;
+}
+
+.vs-icon {
+  width: 80px;
+  animation: popVs 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes popVs {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px #ff0);
+  }
+  100% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 20px #ff0);
+  }
 }

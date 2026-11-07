@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import SuccessModal from './SuccessModal';
 import VillainBar from './VillainBar'; 
 import VillainDefeatedModal from './VillainDefeatedModal';
@@ -49,6 +49,8 @@ function shuffleArray(array) {
 }
 
 const GameRestas = ({ onGameOver, score, setScore }) => {
+  const answerTimer = useRef(null);
+  useEffect(() => () => clearTimeout(answerTimer.current), []);
   // Fases: learning o challenge
   const [stage, setStage] = useState("learning");
   // selectedBase = 1..13 => base normal, 14 => modo Sorpresa
@@ -60,6 +62,12 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
   const [lives, setLives] = useState(initialLives);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const options = useMemo(() => {
+    if (!currentQuestion) return [];
+    const correct = currentQuestion.correctAnswer;
+    return shuffleArray([correct, correct + 1, correct > 0 ? correct - 1 : correct + 2]);
+  }, [currentQuestion]);
+
   const [lifeLost, setLifeLost] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [gameOverState, setGameOverState] = useState(false);
@@ -90,7 +98,10 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
   /**
    * Genera una pregunta de resta
    */
-  function generateQuestion() {
+
+
+  // Define HP del villano al entrar en challenge
+  const generateQuestion = useCallback(() => {
     if (!isSorpresaMode) {
       // base normal
       const base = selectedBase || 2;
@@ -122,26 +133,19 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
       let minuendo, subtrahend;
 
       do {
-        minuendo = Math.floor(Math.random() * (maxA - 10)) + 10; 
+        minuendo = Math.floor(Math.random() * (maxA - 10)) + 10;
         subtrahend = Math.floor(Math.random() * (maxB - 10)) + 10;
-
-        // Asegura que el minuendo sea menor en las unidades o decenas
-        if (difficulty === 'Osado' || difficulty === 'Guerrero') {
-          const minuendoStr = minuendo.toString();
-          const subtrahendStr = subtrahend.toString();
-          if (minuendoStr[minuendoStr.length - 1] >= subtrahendStr[subtrahendStr.length - 1]) {
-            continue;
-          }
-        }
-      } while (minuendo - subtrahend < 0);
+      } while (minuendo < subtrahend || (
+        (difficulty === 'Osado' || difficulty === 'Guerrero') &&
+        minuendo % 10 >= subtrahend % 10
+      ));
 
       // Asegura que no salga negativo
       const correctAnswer = minuendo - subtrahend;
       setCurrentQuestion({ minuendo, subtrahend, correctAnswer });
     }
-  }
+  }, [difficulty, isSorpresaMode, selectedBase]);
 
-  // Define HP del villano al entrar en challenge
   useEffect(() => {
     if (stage === "challenge") {
       let baseHP;
@@ -175,50 +179,30 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
       setLifeLost(false);
       setSelectedOption(null);
     }
-  }, [questionNumber, stage, difficulty]);
+  }, [questionNumber, stage, generateQuestion]);
 
   /**
    * Baraja las opciones
    */
-  function getShuffledOptions() {
-    if (!currentQuestion) return [];
-    const correct = currentQuestion.correctAnswer;
-    const alt1 = correct + 1;
-    const alt2 = correct - 1;
 
-    let options = [correct, alt1, alt2].filter((v) => v >= 0);
-    // Si, por ejemplo, uno sale negativo, lo eliminamos => podemos perder slots
-    while (options.length < 3) {
-      options.push(correct + (Math.random() > 0.5 ? 2 : -2));
-    }
-    // Quita duplicados
-    options = Array.from(new Set(options));
-
-    return shuffleArray(options);
-  }
 
   /**
    * Manejo de respuesta
    */
   function handleAnswer(option) {
-    if (!currentQuestion) return;
+    if (!currentQuestion || selectedOption !== null || gameOverState || showSuccessModal || villainDefeated) return;
     setSelectedOption(option);
 
     if (option === currentQuestion.correctAnswer) {
-      correctSound.play();
+      correctSound.play().catch(() => {});
       setScore(prev => prev + 1);
 
       // Villano
-      setVillainHP(prev => {
-        const newHP = prev - 1;
-        if (newHP <= 0) {
-          setVillainDefeated(true);
-          return 0;
-        }
-        return newHP;
-      });
+      const nextHP = Math.max(0, villainHP - 1);
+      setVillainHP(nextHP);
+      if (nextHP === 0) setVillainDefeated(true);
 
-      setTimeout(() => {
+      answerTimer.current = setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
           const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
           setRandomMotivationalMessage(msg);
@@ -229,12 +213,12 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
       }, 800);
     } else {
       // Incorrect
-      wrongAnswerSound.play();
+      wrongAnswerSound.play().catch(() => {});
       const newLives = lives - 1;
       setLives(newLives);
       setLifeLost(true);
 
-      setTimeout(() => {
+      answerTimer.current = setTimeout(() => {
         if (newLives <= 0) {
           setGameOverState(true);
         } else {
@@ -250,10 +234,7 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
     }
   }
 
-  function closeSuccessModal() {
-    setShowSuccessModal(false);
-    onGameOver();
-  }
+
 
   // Villano derrotado
   const handleVillainDefeatedContinue = () => {
@@ -265,20 +246,7 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
   };
 
   // Render corazones
-  function renderHearts() {
-    const hearts = [];
-    for (let i = 0; i < lives; i++) {
-      hearts.push(
-        <img
-          key={i}
-          src="/brucatkids/images/heart_full.png"
-          alt="Heart"
-          className={`heart-icon ${lifeLost && i === lives - 1 ? 'lost' : ''}`}
-        />
-      );
-    }
-    return hearts;
-  }
+
 
   let content;
   // Fase LEARNING
@@ -385,12 +353,12 @@ const GameRestas = ({ onGameOver, score, setScore }) => {
   // Fase CHALLENGE
   else if (stage === 'challenge') {
     if (gameOverState) {
-      content = <GameOverModal onGameOver={onGameOver} />;
+      content = <GameOverModal onGameOver={() => onGameOver(false)} />;
     } else if (!currentQuestion) {
       content = <div>Cargando...</div>;
     } else {
       // Obtenemos las opciones barajadas
-      const options = getShuffledOptions();
+
 
       content = (
         <div className="game-container">

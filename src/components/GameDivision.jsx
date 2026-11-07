@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import SuccessModal from './SuccessModal';
 import VillainBar from './VillainBar';
 import VillainDefeatedModal from './VillainDefeatedModal';
@@ -64,6 +64,8 @@ function shuffleArray(array) {
 }
 
 const GameDivision = ({ onGameOver, score, setScore }) => {
+  const answerTimer = useRef(null);
+  useEffect(() => () => clearTimeout(answerTimer.current), []);
   // Fases: learning o challenge
   const [stage, setStage] = useState("learning");
   // Divisor seleccionado (2..13) o 14 => modo Sorpresa
@@ -75,6 +77,12 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
   const [lives, setLives] = useState(initialLives);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const options = useMemo(() => {
+    if (!currentQuestion) return [];
+    const correct = currentQuestion.correctAnswer;
+    return shuffleArray([correct, correct + 1, correct > 0 ? correct - 1 : correct + 2]);
+  }, [currentQuestion]);
+
   const [lifeLost, setLifeLost] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [gameOverState, setGameOverState] = useState(false);
@@ -104,7 +112,10 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
   /**
    * Genera una pregunta de división
    */
-  function generateQuestion() {
+
+
+  // Al entrar a challenge => definimos HP villano
+  const generateQuestion = useCallback(() => {
     if (!isSorpresaMode) {
       // Modo normal
       const divisor = selectedDivisor || 2;
@@ -165,9 +176,8 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
         correctAnswer: quotient
       });
     }
-  }
+  }, [difficulty, isSorpresaMode, selectedDivisor]);
 
-  // Al entrar a challenge => definimos HP villano
   useEffect(() => {
     if (stage === "challenge") {
       let baseHP;
@@ -199,50 +209,30 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
       setLifeLost(false);
       setSelectedOption(null);
     }
-  }, [questionNumber, stage, difficulty]);
+  }, [questionNumber, stage, generateQuestion]);
 
   /**
    * Baraja opciones
    */
-  function getShuffledOptions() {
-    if (!currentQuestion) return [];
-    const correct = currentQuestion.correctAnswer;
-    const alt1 = correct + 1;
-    const alt2 = correct - 1;
-    let baseOptions = [correct, alt1, alt2].filter(v => v > 0);
 
-    // Evitar duplicados
-    baseOptions = Array.from(new Set(baseOptions));
-    // Asegurarnos de 3
-    while (baseOptions.length < 3) {
-      baseOptions.push(correct + (Math.random() > 0.5 ? 2 : -2));
-    }
-
-    return shuffleArray(baseOptions);
-  }
 
   /**
    * Manejo de la respuesta
    */
   function handleAnswer(option) {
-    if (!currentQuestion) return;
+    if (!currentQuestion || selectedOption !== null || gameOverState || showSuccessModal || villainDefeated) return;
     setSelectedOption(option);
 
     if (option === currentQuestion.correctAnswer) {
-      correctSound.play();
+      correctSound.play().catch(() => {});
       setScore(prev => prev + 1);
 
       // Villano - quitar 1 HP
-      setVillainHP(prev => {
-        const newHP = prev - 1;
-        if (newHP <= 0) {
-          setVillainDefeated(true);
-          return 0;
-        }
-        return newHP;
-      });
+      const nextHP = Math.max(0, villainHP - 1);
+      setVillainHP(nextHP);
+      if (nextHP === 0) setVillainDefeated(true);
 
-      setTimeout(() => {
+      answerTimer.current = setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
           const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
           setRandomMotivationalMessage(msg);
@@ -253,12 +243,12 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
       }, 800);
     } else {
       // Incorrect
-      wrongAnswerSound.play();
+      wrongAnswerSound.play().catch(() => {});
       const newLives = lives - 1;
       setLives(newLives);
       setLifeLost(true);
 
-      setTimeout(() => {
+      answerTimer.current = setTimeout(() => {
         if (newLives <= 0) {
           setGameOverState(true);
         } else {
@@ -274,10 +264,7 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
     }
   }
 
-  function closeSuccessModal() {
-    setShowSuccessModal(false);
-    onGameOver();
-  }
+
 
   // Villano derrotado
   const handleVillainDefeatedContinue = () => {
@@ -289,20 +276,7 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
   };
 
   // Render vidas (corazones)
-  function renderHearts() {
-    const hearts = [];
-    for (let i = 0; i < lives; i++) {
-      hearts.push(
-        <img
-          key={i}
-          src="/brucatkids/images/heart_full.png"
-          alt="Heart"
-          className={`heart-icon ${lifeLost && i === lives - 1 ? 'lost' : ''}`}
-        />
-      );
-    }
-    return hearts;
-  }
+
 
   let content;
 
@@ -444,20 +418,11 @@ const GameDivision = ({ onGameOver, score, setScore }) => {
   // Fase CHALLENGE
   else if (stage === "challenge") {
     if (gameOverState) {
-      content = <GameOverModal onGameOver={onGameOver} />;
+      content = <GameOverModal onGameOver={() => onGameOver(false)} />;
     } else if (!currentQuestion) {
       content = <div>Cargando...</div>;
     } else {
-      const correct = currentQuestion.correctAnswer;
-      const alt1 = correct + 1;
-      const alt2 = correct - 1;
-      let baseOptions = [correct, alt1, alt2].filter((val) => val > 0);
 
-      baseOptions = Array.from(new Set(baseOptions));
-      while (baseOptions.length < 3) {
-        baseOptions.push(correct + (Math.random() > 0.5 ? 2 : -2));
-      }
-      const options = shuffleArray(baseOptions);
 
       content = (
         <div className="game-container">

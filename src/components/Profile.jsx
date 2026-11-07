@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '/src/assets/Profile.css';
 
-// Definición de niveles de evolución para cada personaje
 const allEvolutionLevels = {
   robot: [
     { thresholdMin: 0, thresholdMax: 9, image: '/brucatkids/images/robot.png' },
@@ -31,46 +30,33 @@ const allEvolutionLevels = {
     { thresholdMin: 0, thresholdMax: 9, image: '/brucatkids/images/cat.png' },
     { thresholdMin: 10, thresholdMax: 19, image: '/brucatkids/images/cat2.png' },
     { thresholdMin: 20, thresholdMax: 29, image: '/brucatkids/images/cat3.png' },
-    { thresholdMin: 30, thresholdMax: Infinity, image: '/brucatkids/images/cat4.png' },
+    { thresholdMin: 30, thresholdMax: Infinity, image: '/brucatkids/images/cat5.png' },
   ],
 };
 
-const Profile = ({ character, score }) => {
-  // Obtenemos las evoluciones del personaje
+const Profile = ({ character, score, compact = false }) => {
   const evolutionLevels = allEvolutionLevels[character] || allEvolutionLevels.robot;
-
-  // Imagen actual y si está en evolución (brillo)
-  const [currentImage, setCurrentImage] = useState(evolutionLevels[0].image);
+  const level = evolutionLevels.find(level => score >= level.thresholdMin && score <= level.thresholdMax) || evolutionLevels[0];
+  const currentImage = level.image;
+  const previousImage = useRef(currentImage);
   const [evolved, setEvolved] = useState(false);
 
   useEffect(() => {
-    let newImage = evolutionLevels[0].image;
-    let isMax = false; 
-    evolutionLevels.forEach(level => {
-      if (score >= level.thresholdMin && score <= level.thresholdMax) {
-        newImage = level.image;
-        if (level.thresholdMin === 30) {
-          isMax = true; // Evolución máxima
-        }
-      }
-    });
-    if (newImage !== currentImage) {
-      setCurrentImage(newImage);
-      setEvolved(isMax ? 'max' : true);
-
-      // Diferente duración si es la evolución máxima o no
-      const timer = setTimeout(() => {
-        setEvolved(false);
-      }, isMax ? 3000 : 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [score, currentImage, evolutionLevels]);
+    if (previousImage.current === currentImage) return;
+    previousImage.current = currentImage;
+    setEvolved(level.thresholdMin === 30 ? 'max' : true);
+    const timer = setTimeout(() => setEvolved(false), level.thresholdMin === 30 ? 3000 : 2000);
+    return () => clearTimeout(timer);
+  }, [currentImage, level.thresholdMin]);
 
   return (
-    <div className="profile-container highlight-profile">
-      <h3 className="profile-label">PERSONAJE</h3>
-      <h2 className="profile-name">{character.charAt(0).toUpperCase() + character.slice(1)}</h2>
+    <div className={`profile-container ${compact ? 'compact-profile' : 'highlight-profile'}`}>
+      {!compact && <h3 className="profile-label">PERSONAJE</h3>}
+      {!compact && (
+        <h2 className="profile-name">
+          {character.charAt(0).toUpperCase() + character.slice(1)}
+        </h2>
+      )}
       <div className={`profile-image ${evolved === 'max' ? 'max-shining' : evolved ? 'shining' : ''}`}>
         <img src={currentImage} alt="Personaje Evolutivo" />
       </div>

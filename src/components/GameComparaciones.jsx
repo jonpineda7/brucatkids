@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import SuccessModal from './SuccessModal';
 import VillainBar from './VillainBar';
 import VillainDefeatedModal from './VillainDefeatedModal';
@@ -58,6 +58,12 @@ function getRandomInt(range) {
 }
 
 const GameComparaciones = ({ onGameOver, score, setScore }) => {
+  function getRandomMotivationalMessage(diff) {
+    const messages = motivationalMessages[diff] || motivationalMessages.Aprendiz;
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+  const answerTimer = useRef(null);
+  useEffect(() => () => clearTimeout(answerTimer.current), []);
   // Fases: learning o challenge
   const [stage, setStage] = useState('learning');
   // Simulando un “selectedBase” para coherencia con la UI (1..13 => no real base, 14 => “Sorpresa”)
@@ -88,44 +94,7 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
 
   const isSorpresaMode = (selectedBase === 14);
 
-  useEffect(() => {
-    if (stage === 'challenge') {
-      // Definir HP del villano
-      let baseHP;
-      if (isSorpresaMode) {
-        switch (difficulty) {
-          case 'Aprendiz': baseHP = 12; break;
-          case 'Osado': baseHP = 18; break;
-          case 'Guerrero': baseHP = 25; break;
-          default: baseHP = 12;
-        }
-      } else {
-        switch (difficulty) {
-          case 'Aprendiz': baseHP = 10; break;
-          case 'Osado': baseHP = 15; break;
-          case 'Guerrero': baseHP = 20; break;
-          default: baseHP = 10;
-        }
-      }
-      setVillainHP(baseHP);
-      setVillainMaxHP(baseHP);
-      setVillainDefeated(false);
-    }
-  }, [stage, difficulty, isSorpresaMode]);
-
-  useEffect(() => {
-    if (stage === 'challenge') {
-      generateQuestion();
-      setLifeLost(false);
-      setSelectedOption(null);
-    }
-  }, [questionNumber, stage, difficulty]);
-
-  /**
-   * Genera una pregunta de comparaciones
-   * La pregunta es: \"¿a symbol b es VERDADERO?\" => el niño escoge \"VERDADERO\" o \"FALSO\".
-   */
-  function generateQuestion() {
+  const generateQuestion = useCallback(() => {
     // Determinar rango de a y b según la dificultad
     let maxRangeA = 20;
     let maxRangeB = 20;
@@ -171,7 +140,46 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
       // Este boolean indica si la afirmación \"a symbol b\" es verdadera
       isTrueCorrect: isTrue
     });
-  }
+  }, [difficulty, isSorpresaMode]);
+
+  useEffect(() => {
+    if (stage === 'challenge') {
+      // Definir HP del villano
+      let baseHP;
+      if (isSorpresaMode) {
+        switch (difficulty) {
+          case 'Aprendiz': baseHP = 12; break;
+          case 'Osado': baseHP = 18; break;
+          case 'Guerrero': baseHP = 25; break;
+          default: baseHP = 12;
+        }
+      } else {
+        switch (difficulty) {
+          case 'Aprendiz': baseHP = 10; break;
+          case 'Osado': baseHP = 15; break;
+          case 'Guerrero': baseHP = 20; break;
+          default: baseHP = 10;
+        }
+      }
+      setVillainHP(baseHP);
+      setVillainMaxHP(baseHP);
+      setVillainDefeated(false);
+    }
+  }, [stage, difficulty, isSorpresaMode]);
+
+  useEffect(() => {
+    if (stage === 'challenge') {
+      generateQuestion();
+      setLifeLost(false);
+      setSelectedOption(null);
+    }
+  }, [questionNumber, stage, generateQuestion]);
+
+  /**
+   * Genera una pregunta de comparaciones
+   * La pregunta es: \"¿a symbol b es VERDADERO?\" => el niño escoge \"VERDADERO\" o \"FALSO\".
+   */
+
 
   // Evalúa si \"a (symbol) b\" es cierto
   function evaluateComparison(a, b, symbol) {
@@ -186,25 +194,20 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
   }
 
   function handleAnswer(userSaysTrue) {
-    if (!currentQuestion) return;
+    if (!currentQuestion || selectedOption !== null || gameOverState || showSuccessModal || villainDefeated) return;
     setSelectedOption(userSaysTrue ? 'VERDADERO' : 'FALSO');
 
     const isCorrect = (currentQuestion.isTrueCorrect === userSaysTrue);
 
     if (isCorrect) {
-      correctSound.play();
+      correctSound.play().catch(() => {});
       setScore(prev => prev + 1);
       // Quitar HP al villano
-      setVillainHP(prev => {
-        const newHP = prev - 1;
-        if (newHP <= 0) {
-          setVillainDefeated(true);
-          return 0;
-        }
-        return newHP;
-      });
+      const nextHP = Math.max(0, villainHP - 1);
+      setVillainHP(nextHP);
+      if (nextHP === 0) setVillainDefeated(true);
 
-      setTimeout(() => {
+      answerTimer.current = setTimeout(() => {
         if (questionNumber + 1 >= totalQuestions) {
           const msg = getRandomMotivationalMessage(difficulty || 'Aprendiz');
           setRandomMotivationalMessage(msg);
@@ -214,12 +217,12 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
         }
       }, 800);
     } else {
-      wrongAnswerSound.play();
+      wrongAnswerSound.play().catch(() => {});
       const newLives = lives - 1;
       setLives(newLives);
       setLifeLost(true);
 
-      setTimeout(() => {
+      answerTimer.current = setTimeout(() => {
         if (newLives <= 0) {
           setGameOverState(true);
         } else {
@@ -235,10 +238,7 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
     }
   }
 
-  function closeSuccessModal() {
-    setShowSuccessModal(false);
-    onGameOver();
-  }
+
 
   // Villano derrotado
   const handleVillainDefeatedContinue = () => {
@@ -250,20 +250,7 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
   };
 
   // Render corazones
-  function renderHearts() {
-    const hearts = [];
-    for (let i = 0; i < lives; i++) {
-      hearts.push(
-        <img
-          key={i}
-          src="/brucatkids/images/heart_full.png"
-          alt="Heart"
-          className={`heart-icon ${lifeLost && i === lives - 1 ? 'lost' : ''}`}
-        />
-      );
-    }
-    return hearts;
-  }
+
 
   // Construct content
   let content;
@@ -378,7 +365,7 @@ const GameComparaciones = ({ onGameOver, score, setScore }) => {
   // Fase CHALLENGE
   else if (stage === 'challenge') {
     if (gameOverState) {
-      content = <GameOverModal onGameOver={onGameOver} />;
+      content = <GameOverModal onGameOver={() => onGameOver(false)} />;
     } else if (!currentQuestion) {
       content = <div>Cargando...</div>;
     } else {
