@@ -23,6 +23,15 @@ Las categorías Lenguaje y Ciencias y los juegos de KINDER aún no están dispon
 
 ## Despliegue
 
-`npm run build` genera `dist/`. `npm run deploy` publica esa carpeta en GitHub Pages; ejecuta la compilación antes de desplegar.
+El código fuente se mantiene en `main`. Para publicar desde esa rama:
+
+```sh
+git switch main
+npm run deploy
+```
+
+`npm run deploy` compila automáticamente el proyecto y publica únicamente `dist/` en `gh-pages`, con `.nojekyll`. No se debe fusionar `main` en `gh-pages` ni fusionar los archivos publicados de vuelta a `main`.
+
+En GitHub, Pages debe publicar desde la rama `gh-pages`, carpeta `/ (root)`. El sitio se sirve en https://jonpineda7.github.io/brucatkids/.
 
 La configuración actual usa `/brucatkids/` como ruta base. Los recursos estáticos también usan ese prefijo; ambos deben ajustarse si se cambia la ruta de publicación.
