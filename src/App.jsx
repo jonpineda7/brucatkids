@@ -91,11 +91,12 @@ function App() {
   };
 
   return (
-    <div className={`app-shell ${selectedGame ? 'is-playing' : category && !bonusActive ? 'is-game-selection' : ''}`}>
+    <div className={`app-shell ${selectedGame ? 'is-playing' : character && !bonusActive ? 'is-game-selection' : ''}`}>
       {character === null ? (
         <div className="welcome-screen">
-          <h1>¡Bienvenidos a BruCat Kids!</h1>
-          <p>Selecciona tu personaje</p>
+          <span className="view-eyebrow">BRUCAT KIDS · APRENDER ES UNA AVENTURA</span>
+          <h1>¡Tu aventura empieza aquí!</h1>
+          <p>Elige al compañero que crecerá contigo.</p>
           <CharacterSelection onSelect={handleCharacterSelect} />
         </div>
       ) : (
@@ -104,10 +105,16 @@ function App() {
           {bonusActive ? (
             <BonusGame onComplete={handleBonusComplete} />
           ) : course === null ? (
-            <div>
-              {/* <button onClick={() => handleCourseSelect('KINDER')}>KINDER</button> */}
-              <button onClick={() => handleCourseSelect('Tercero Básico')}>Tercero Básico</button>
-            </div>
+            <section className="path-selection" aria-labelledby="course-title">
+              <span className="view-eyebrow">PASO 1 · TU CAMINO</span>
+              <h2 id="course-title">¡Vamos a aprender!</h2>
+              <p>Comienza tu aventura en tercero básico.</p>
+              <button className="path-card" onClick={() => handleCourseSelect('Tercero Básico')}>
+                <span className="path-symbol" aria-hidden="true">🎒</span>
+                <span><strong>Tercero Básico</strong><small>Números, desafíos y descubrimientos</small></span>
+                <span className="path-arrow" aria-hidden="true">→</span>
+              </button>
+            </section>
           ) : category === null ? (
             <CategorySelection course={course} onSelectCategory={handleCategorySelect} />
           ) : selectedGame === null ? (
@@ -125,7 +132,7 @@ function App() {
 
 
           {!bonusActive && character && (course || category || selectedGame) && (
-            <button onClick={handleBack} className="back-button">Volver</button>
+            <button onClick={handleBack} className="back-button">{selectedGame ? "← Elegir otro juego" : category ? "← Cambiar categoría" : "← Volver"}</button>
           )}
         </>
       )}

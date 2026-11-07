@@ -1,3 +1,4 @@
+import ResultDialog from './ResultDialog';
 import Profile from './Profile';
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import SuccessModal from './SuccessModal';
@@ -40,15 +41,10 @@ const initialLives = 5;
 
 // Modal de Game Over
 const GameOverModal = ({ onGameOver }) => (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <h2>¡Game Over! ¡Bien Hecho!</h2>
-      <p>No te rindas, sigue practicando la división.</p>
-      <button onClick={onGameOver} className="modal-btn">
-        Volver al inicio
-      </button>
-    </div>
-  </div>
+  <ResultDialog title="¡Sigamos practicando!" icon="🌱">
+    <p>Cada intento te ayuda a aprender. Tu próxima aventura te espera.</p>
+    <button onClick={onGameOver}>Volver a los juegos →</button>
+  </ResultDialog>
 );
 
 /**
@@ -319,10 +315,10 @@ const GameDivision = ({ character, onGameOver, score, setScore }) => {
             <p className="learning-instruction">
               ¡Excelente! Ahora elige tu nivel de dificultad para practicar.
             </p>
-            <div className="table-options">
-              <button onClick={() => setDifficulty('Aprendiz')}>Aprendiz</button>
-              <button onClick={() => setDifficulty('Osado')}>Osado</button>
-              <button onClick={() => setDifficulty('Guerrero')}>Guerrero</button>
+            <div className="table-options difficulty-options">
+              <button onClick={() => setDifficulty('Aprendiz')}><span>🌱 Aprendiz</span><small>Paso a paso</small></button>
+              <button onClick={() => setDifficulty('Osado')}><span>⚡ Osado</span><small>Un nuevo desafío</small></button>
+              <button onClick={() => setDifficulty('Guerrero')}><span>🛡️ Guerrero</span><small>Supera tus límites</small></button>
             </div>
             {/* Se omite un segundo botón \"Volver\" aquí para evitar duplicar */}
             {/* Queda el \"Volver\" final en la otra subpantalla si la user ya eligió dificultad */}
@@ -335,10 +331,10 @@ const GameDivision = ({ character, onGameOver, score, setScore }) => {
             <p className="learning-instruction">
               ¡Excelente! Ahora elige tu nivel de dificultad para practicar.
             </p>
-            <div className="table-options">
-              <button onClick={() => setDifficulty('Aprendiz')}>Aprendiz</button>
-              <button onClick={() => setDifficulty('Osado')}>Osado</button>
-              <button onClick={() => setDifficulty('Guerrero')}>Guerrero</button>
+            <div className="table-options difficulty-options">
+              <button onClick={() => setDifficulty('Aprendiz')}><span>🌱 Aprendiz</span><small>Paso a paso</small></button>
+              <button onClick={() => setDifficulty('Osado')}><span>⚡ Osado</span><small>Un nuevo desafío</small></button>
+              <button onClick={() => setDifficulty('Guerrero')}><span>🛡️ Guerrero</span><small>Supera tus límites</small></button>
             </div>
             {/* Igualmente aquí, no insertamos un \"Volver\" extra */}
           </div>
@@ -377,7 +373,7 @@ const GameDivision = ({ character, onGameOver, score, setScore }) => {
               }}
               className="back-button"
             >
-              Volver
+              ← Cambiar selección
             </button>
           </div>
         );
@@ -402,7 +398,7 @@ const GameDivision = ({ character, onGameOver, score, setScore }) => {
               }}
               className="back-button"
             >
-              Volver
+              ← Cambiar selección
             </button>
           </div>
         );
@@ -442,7 +438,7 @@ const GameDivision = ({ character, onGameOver, score, setScore }) => {
                 <button
                   key={i}
                   onClick={() => handleAnswer(opt)}
-                  className="answer-btn"
+                  className={`answer-btn ${selectedOption === opt ? (opt === currentQuestion.correctAnswer ? 'correct' : 'incorrect') : ''}`}
                   disabled={selectedOption !== null}
                 >
                   {opt}

@@ -1,3 +1,4 @@
+import Profile from './Profile';
 import React, { useState, useRef, useEffect } from 'react';
 import SuccessModal from './SuccessModal';
 
@@ -11,7 +12,7 @@ const fraccionesSimples = [
 
 const totalQuestions = 6;
 
-const GameFracciones = ({ onGameOver, setScore: setTotalScore }) => {
+const GameFracciones = ({ character, score: totalScore, onGameOver, setScore: setTotalScore }) => {
   const answerTimer = useRef(null);
   useEffect(() => () => clearTimeout(answerTimer.current), []);
   const [stage, setStage] = useState('learning');
@@ -70,10 +71,10 @@ const GameFracciones = ({ onGameOver, setScore: setTotalScore }) => {
       <div className="learning-stage">
         <h2>Repartiendo la Pizza</h2>
         <p>Las fracciones representan partes de un todo. Por ejemplo:</p>
-        <ul>
-          <li><strong>1/2</strong> = mitad</li>
-          <li><strong>1/4</strong> = un cuarto</li>
-          <li><strong>3/4</strong> = tres cuartos</li>
+        <ul className="fraction-examples">
+          <li><span aria-hidden="true">🍕</span><strong>1/2</strong><span>Una mitad</span></li>
+          <li><span aria-hidden="true">🍕</span><strong>1/4</strong><span>Un cuarto</span></li>
+          <li><span aria-hidden="true">🍕</span><strong>3/4</strong><span>Tres cuartos</span></li>
         </ul>
         <p className="learning-instruction">¿Estás listo para jugar?</p>
         <button className="next-button" onClick={() => setStage('challenge')}>
@@ -85,12 +86,13 @@ const GameFracciones = ({ onGameOver, setScore: setTotalScore }) => {
 
   return (
     <div className="game-container">
-      <h2 className="game-title">¿Qué fracción representa esta pizza?
-      </h2>
+      <h2 className="game-title">¡Descubre la porción!</h2>
+      <div className="fraction-hud"><Profile character={character} score={totalScore} compact /><span>🍕 Pregunta {questionNumber + 1} de {totalQuestions}</span></div>
+      <p>¿Qué fracción representa esta pizza?</p>
       <img
         src={`/brucatkids/images/pizza_${currentQuestion.correct.label.replace('/', '-')}.png`}
         alt="Pizza"
-        style={{ width: '200px', margin: '20px auto' }}
+        className="fraction-pizza"
       />
       <div className="answer-buttons">
         {currentQuestion.options.map((option, index) => (

@@ -56,7 +56,7 @@ const Profile = ({ character, score, compact = false }) => {
       {!compact && <h3 className="profile-label">PERSONAJE</h3>}
       {!compact && (
         <h2 className="profile-name">
-          {character.charAt(0).toUpperCase() + character.slice(1)}
+          {{ robot: 'Robot', knight: 'Caballero', unicorn: 'Unicornio', astronaut: 'Astronauta', cat: 'Gatito' }[character] || 'Compañero'}
         </h2>
       )}
       <div className={`profile-image ${evolved === 'max' ? 'max-shining' : evolved ? 'shining' : ''}`}>

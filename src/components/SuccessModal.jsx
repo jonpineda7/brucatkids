@@ -1,17 +1,10 @@
-import React from 'react';
+import ResultDialog from './ResultDialog';
 
-const SuccessModal = ({ message, onConfirm }) => {
+export default function SuccessModal({ message, onConfirm }) {
   return (
-    <div className="modal-overlay">
-      <div className="modal-content success">
-        <h2>¡Increíble trabajo!</h2>
-        <p>{message}</p>
-        <button onClick={onConfirm} className="modal-btn">
-          ¡Sigue brillando!
-        </button>
-      </div>
-    </div>
+    <ResultDialog title="¡Increíble trabajo!" icon="🏆">
+      <p>{message}</p>
+      <button onClick={onConfirm}>¡Elegir otra aventura! →</button>
+    </ResultDialog>
   );
-};
-
-export default SuccessModal;
+}

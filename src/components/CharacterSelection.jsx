@@ -1,36 +1,24 @@
-import React from 'react';
-import { soundSelectCharacter } from '../utils/sounds'; // Importa el sonido
+import { soundSelectCharacter } from '../utils/sounds';
 
-function CharacterSelection({ onSelect }) {
-  const handleCharacterSelect = (character) => {
-    soundSelectCharacter(); // Reproduce el sonido cuando se selecciona un personaje
-    onSelect(character);
-  };
+const companions = [
+  { id: 'robot', name: 'Robot', description: '¡Recarga tus ideas!', color: 'mint' },
+  { id: 'knight', name: 'Caballero', description: 'Valiente ante cada reto', color: 'peach' },
+  { id: 'unicorn', name: 'Unicornio', description: 'Imagina lo imposible', color: 'lavender' },
+  { id: 'astronaut', name: 'Astronauta', description: 'Explora nuevos mundos', color: 'sky' },
+  { id: 'cat', name: 'Gatito', description: 'Curioso como tú', color: 'rose' },
+];
 
+export default function CharacterSelection({ onSelect }) {
   return (
     <div className="character-selection-grid">
-      <button type="button" className="character-card" onClick={() => handleCharacterSelect('robot')}>
-        <img alt="Robot" src="/brucatkids/images/robot.png" />
-        <p>Robot</p>
-      </button>
-      <button type="button" className="character-card" onClick={() => handleCharacterSelect('knight')}>
-        <img alt="Knight" src="/brucatkids/images/knight.png" />
-        <p>Knight</p>
-      </button>
-      <button type="button" className="character-card" onClick={() => handleCharacterSelect('unicorn')}>
-        <img alt="Unicorn" src="/brucatkids/images/unicorn.png" />
-        <p>Unicorn</p>
-      </button>
-      <button type="button" className="character-card" onClick={() => handleCharacterSelect('astronaut')}>
-        <img alt="Astronaut" src="/brucatkids/images/astronaut.png" />
-        <p>Astronaut</p>
-      </button>
-      <button type="button" className="character-card" onClick={() => handleCharacterSelect('cat')}>
-        <img alt="Cat" src="/brucatkids/images/cat.png" />
-        <p>Cat</p>
-      </button>
+      {companions.map(({ id, name, description, color }) => (
+        <button type="button" className={`character-card companion-${color}`} key={id}
+          onClick={() => { soundSelectCharacter(); onSelect(id); }} aria-label={`Elegir ${name}`}>
+          <img alt="" src={`${import.meta.env.BASE_URL}images/${id}.png`} />
+          <strong>{name}</strong><small>{description}</small>
+          <span className="companion-choose" aria-hidden="true">¡Vamos! →</span>
+        </button>
+      ))}
     </div>
   );
 }
-
-export default CharacterSelection;

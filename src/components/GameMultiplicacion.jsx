@@ -1,3 +1,4 @@
+import ResultDialog from './ResultDialog';
 import Profile from './Profile';
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import SuccessModal from './SuccessModal';
@@ -9,15 +10,10 @@ const initialLives = 5;
 
 // Modal simple de Game Over
 const GameOverModal = ({ onGameOver }) => (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <h2>¡Game Over! ¡Bien Hecho!</h2>
-      <p>No te rindas, sigue practicando la multiplicación.</p>
-      <button onClick={onGameOver} className="modal-btn">
-        Volver al inicio
-      </button>
-    </div>
-  </div>
+  <ResultDialog title="¡Sigamos practicando!" icon="🌱">
+    <p>Cada intento te ayuda a aprender. Tu próxima aventura te espera.</p>
+    <button onClick={onGameOver}>Volver a los juegos →</button>
+  </ResultDialog>
 );
 
 // Frases motivadoras
@@ -269,10 +265,10 @@ const GameMultiplicacion = ({ character, onGameOver, score, setScore }) => {
           <p className="learning-instruction">
             ¡Excelente! Elige tu nivel de dificultad:
           </p>
-          <div className="table-options">
-            <button onClick={() => setDifficulty('Aprendiz')}>Aprendiz</button>
-            <button onClick={() => setDifficulty('Osado')}>Osado</button>
-            <button onClick={() => setDifficulty('Guerrero')}>Guerrero</button>
+          <div className="table-options difficulty-options">
+            <button onClick={() => setDifficulty('Aprendiz')}><span>🌱 Aprendiz</span><small>Paso a paso</small></button>
+            <button onClick={() => setDifficulty('Osado')}><span>⚡ Osado</span><small>Un nuevo desafío</small></button>
+            <button onClick={() => setDifficulty('Guerrero')}><span>🛡️ Guerrero</span><small>Supera tus límites</small></button>
           </div>
         </div>
       );
@@ -286,7 +282,7 @@ const GameMultiplicacion = ({ character, onGameOver, score, setScore }) => {
             <p className="difficulty-label">Nivel: {difficulty}</p>
             <div className="table-grid">
               {rows.map(num => (
-                <div
+                <button type="button"
                   key={num}
                   className="table-cell"
                   onClick={() => speakText(`${selectedTable} por ${num} es ${selectedTable * num}`)}
@@ -294,7 +290,7 @@ const GameMultiplicacion = ({ character, onGameOver, score, setScore }) => {
                   <span className="table-expression">
                     {selectedTable} x {num} = {selectedTable * num}
                   </span>
-                </div>
+                </button>
               ))}
             </div>
             <p className="learning-instruction">
@@ -304,7 +300,7 @@ const GameMultiplicacion = ({ character, onGameOver, score, setScore }) => {
               ¡Listo, vamos a jugar!
             </button>
             <button onClick={() => { setSelectedTable(null); setDifficulty(null); }} className="back-button">
-              Volver
+              ← Cambiar selección
             </button>
           </div>
         );
@@ -320,7 +316,7 @@ const GameMultiplicacion = ({ character, onGameOver, score, setScore }) => {
               ¡Listo, vamos a jugar!
             </button>
             <button onClick={() => { setSelectedTable(null); setDifficulty(null); }} className="back-button">
-              Volver
+              ← Cambiar selección
             </button>
           </div>
         );
@@ -361,7 +357,7 @@ const GameMultiplicacion = ({ character, onGameOver, score, setScore }) => {
                 <button
                   key={i}
                   onClick={() => handleAnswer(opt)}
-                  className="answer-btn"
+                  className={`answer-btn ${selectedOption === opt ? (opt === currentQuestion.correctAnswer ? 'correct' : 'incorrect') : ''}`}
                   disabled={selectedOption !== null}
                 >
                   {opt}

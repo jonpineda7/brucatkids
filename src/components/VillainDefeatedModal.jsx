@@ -1,20 +1,13 @@
-import React from 'react';
+import ResultDialog from './ResultDialog';
 
-const VillainDefeatedModal = ({ onContinue, onEnd }) => {
+export default function VillainDefeatedModal({ onContinue, onEnd }) {
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>¡Villano Derrotado!</h2>
-        <p>¡Felicidades! Has acabado con la energía del villano.</p>
-        <button onClick={onContinue} className="modal-btn">
-          Seguir Respondiendo
-        </button>
-        <button onClick={onEnd} className="modal-btn">
-          Terminar Ahora
-        </button>
+    <ResultDialog title="¡Villano derrotado!" icon="🎉">
+      <p>¡Tus conocimientos ganaron la batalla! Cada desafío te hace más fuerte.</p>
+      <div className="result-actions">
+        <button onClick={onEnd}>Completar misión ✓</button>
+        <button className="secondary-action" onClick={onContinue}>Jugar otra ronda →</button>
       </div>
-    </div>
+    </ResultDialog>
   );
-};
-
-export default VillainDefeatedModal;
+}

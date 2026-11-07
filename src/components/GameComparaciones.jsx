@@ -1,3 +1,4 @@
+import ResultDialog from './ResultDialog';
 import Profile from './Profile';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import SuccessModal from './SuccessModal';
@@ -26,15 +27,10 @@ const motivationalMessages = {
 
 // Modal Game Over
 const GameOverModal = ({ onGameOver }) => (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <h2>¡Game Over! ¡Bien Hecho!</h2>
-      <p>No te rindas, sigue practicando las comparaciones.</p>
-      <button onClick={onGameOver} className="modal-btn">
-        Volver al inicio
-      </button>
-    </div>
-  </div>
+  <ResultDialog title="¡Sigamos practicando!" icon="🌱">
+    <p>Cada intento te ayuda a aprender. Tu próxima aventura te espera.</p>
+    <button onClick={onGameOver}>Volver a los juegos →</button>
+  </ResultDialog>
 );
 
 /**
@@ -293,10 +289,10 @@ const GameComparaciones = ({ character, onGameOver, score, setScore }) => {
           <p className="learning-instruction">
             Selecciona tu nivel de dificultad:
           </p>
-          <div className="table-options">
-            <button onClick={() => setDifficulty('Aprendiz')}>Aprendiz</button>
-            <button onClick={() => setDifficulty('Osado')}>Osado</button>
-            <button onClick={() => setDifficulty('Guerrero')}>Guerrero</button>
+          <div className="table-options difficulty-options">
+            <button onClick={() => setDifficulty('Aprendiz')}><span>🌱 Aprendiz</span><small>Paso a paso</small></button>
+            <button onClick={() => setDifficulty('Osado')}><span>⚡ Osado</span><small>Un nuevo desafío</small></button>
+            <button onClick={() => setDifficulty('Guerrero')}><span>🛡️ Guerrero</span><small>Supera tus límites</small></button>
           </div>
         </div>
       );
@@ -324,7 +320,7 @@ const GameComparaciones = ({ character, onGameOver, score, setScore }) => {
               }}
               className="back-button"
             >
-              Volver
+              ← Cambiar selección
             </button>
           </div>
         );
@@ -349,7 +345,7 @@ const GameComparaciones = ({ character, onGameOver, score, setScore }) => {
               }}
               className="back-button"
             >
-              Volver
+              ← Cambiar selección
             </button>
           </div>
         );

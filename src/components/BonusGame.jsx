@@ -1,58 +1,42 @@
 import '../assets/BonusGame.css';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import ResultDialog from './ResultDialog';
 
-const BonusGame = ({ onComplete }) => {
-  const [bonusScore, setBonusScore] = useState(0);
-  const [stars, setStars] = useState([]);
+const positions = [{ top: 22, left: 20 }, { top: 22, left: 75 }, { top: 50, left: 48 }, { top: 78, left: 22 }, { top: 78, left: 78 }];
+
+export default function BonusGame({ onComplete }) {
+  const [stars, setStars] = useState(() => positions.map((position, id) => ({ ...position, id })));
   const [timeLeft, setTimeLeft] = useState(10);
+  const collected = useRef(new Set());
+  const bonusScore = positions.length - stars.length;
+  const finished = timeLeft === 0 || stars.length === 0;
 
-  // Al montar, generamos 5 estrellas en posiciones aleatorias dentro del área
   useEffect(() => {
-    const generatedStars = Array.from({ length: 5 }, () => ({
-      id: Math.random().toString(36).substr(2, 9),
-      top: Math.random() * 80 + 10, // Entre 10% y 90%
-      left: Math.random() * 80 + 10, // Entre 10% y 90%
-    }));
-    setStars(generatedStars);
-  }, []);
-
-  // Contador de tiempo para el bonus (10 segundos)
-  useEffect(() => {
-    if (timeLeft === 0) {
-      onComplete(bonusScore); // Se llama al callback para notificar la finalización y puntaje bonus
-      return;
-    }
-    const timer = setTimeout(() => {
-      setTimeLeft(timeLeft - 1);
-    }, 1000);
+    if (finished) return;
+    const timer = setTimeout(() => setTimeLeft(previous => Math.max(0, previous - 1)), 1000);
     return () => clearTimeout(timer);
-  }, [timeLeft, bonusScore, onComplete]);
+  }, [timeLeft, finished]);
 
-  const handleStarClick = (id) => {
-    setBonusScore(prev => prev + 1);
-    // Eliminamos la estrella clickeada para que no se pueda volver a recoger
-    setStars(stars.filter(star => star.id !== id));
+  const collect = id => {
+    if (finished || collected.current.has(id)) return;
+    collected.current.add(id);
+    setStars(previous => previous.filter(star => star.id !== id));
   };
 
   return (
-    <div className="bonus-game">
-      <h2>¡Atrapa las Estrellas Bonus!</h2>
-      <p>Tiempo restante: {timeLeft} segundos</p>
-      <p>Puntos Bonus: {bonusScore}</p>
+    <section className="bonus-game" aria-labelledby="bonus-title">
+      <span className="view-eyebrow">¡GANASTE UNA RONDA BONUS!</span>
+      <h2 id="bonus-title">¡Lluvia de estrellas!</h2>
+      <p className="bonus-instruction">Toca las estrellas para sumar energía extra a tu personaje.</p>
+      <div className="bonus-hud"><span>⏱ {timeLeft} segundos</span><span role="status">⭐ {bonusScore} de {positions.length}</span></div>
       <div className="bonus-area">
-        {stars.map(star => (
-          <div 
-            key={star.id}
-            className="star"
-            style={{ top: `${star.top}%`, left: `${star.left}%` }}
-            onClick={() => handleStarClick(star.id)}
-          >
-            ⭐
-          </div>
-        ))}
+        {stars.map(star => <button key={star.id} className="star" style={{ top: `${star.top}%`, left: `${star.left}%` }}
+          onClick={() => collect(star.id)} disabled={finished} aria-label={`Atrapar estrella ${star.id + 1}`}>⭐</button>)}
       </div>
-    </div>
+      {finished && <ResultDialog title={stars.length === 0 ? '¡Las atrapaste todas!' : '¡Estrellas conseguidas!'} icon="🌟">
+        <p>Sumaste {bonusScore} puntos extra. ¡Tu personaje sigue creciendo!</p>
+        <button onClick={() => onComplete(bonusScore)}>Continuar mi aventura →</button>
+      </ResultDialog>}
+    </section>
   );
-};
-
-export default BonusGame;
+}
