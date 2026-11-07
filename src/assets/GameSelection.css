@@ -1,0 +1,67 @@
+.is-game-selection { color: #24364b; padding: 4px; }
+.is-game-selection > .profile-container {
+  display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; grid-template-rows: auto auto;
+  column-gap: 16px; align-items: center; text-align: left; margin: 0 0 22px; padding: 14px 18px;
+  border: 1px solid #d5e9e3; background: #f1faf5; border-radius: 20px; box-shadow: none;
+}
+.is-game-selection > .profile-container .profile-label { display: none; }
+.is-game-selection > .profile-container .profile-image { grid-column: 1; grid-row: 1 / 3; width: 70px; height: 70px; margin: 0; box-shadow: none; overflow: visible; background: white; }
+.is-game-selection > .profile-container .profile-image img { object-fit: contain; }
+.is-game-selection > .profile-container .profile-name { grid-column: 2; grid-row: 1; font-size: 1.15rem; color: #244d43; margin: 0; align-self: end; }
+.is-game-selection > .profile-container .evolution-status { grid-column: 2; grid-row: 2; margin: 4px 0 0; font-size: .85rem; color: #47675e; align-self: start; line-height: 1.4; }
+.is-game-selection > .profile-container .profile-score-bubble { grid-column: 3; grid-row: 1 / 3; margin: 0; padding: 10px 14px; box-shadow: none; font-size: .9rem; white-space: nowrap; }
+.is-game-selection > .profile-container .score-value { font-size: 1.1rem; }
+.game-picker { text-align: left; }
+.game-picker-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
+.game-picker-heading .game-picker-eyebrow { margin: 0 0 6px; color: #625993; font-size: .7rem; letter-spacing: .13em; font-weight: 800; }
+.game-picker-heading h2 { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.2; margin: 0; color: #24364b; }
+.game-picker-heading p { font-size: .9rem; margin: 8px 0 0; color: #5d6b7d; }
+.game-picker-course { font-size: .75rem; background: #edf0f8; color: #4c5874; border-radius: 12px; padding: 9px 12px; max-width: 155px; text-align: center; }
+.game-picker-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.game-picker .game-picker-card {
+  --tile: #e3f5e9; --ink: #21644b; --edge: #bcdfca;
+  display: grid; grid-template-columns: 46px minmax(0, 1fr); align-content: start; align-items: center; gap: 14px 12px;
+  box-sizing: border-box; min-width: 0; width: 100%; margin: 0; padding: 18px 16px 12px;
+  border-radius: 20px; border: 1px solid var(--edge); background: var(--tile); color: #24364b;
+  text-align: left; font-family: inherit; font-size: 1rem; box-shadow: 0 4px 0 var(--edge);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.game-picker .theme-peach { --tile: #fff0e4; --ink: #9a491a; --edge: #f0d4bd; }
+.game-picker .theme-lavender { --tile: #eee9ff; --ink: #62439b; --edge: #d8ccef; }
+.game-picker .theme-sky { --tile: #e3f3ff; --ink: #25628f; --edge: #bfddec; }
+.game-picker .theme-rose { --tile: #ffe9ef; --ink: #9c3e61; --edge: #edc7d4; }
+.game-picker .theme-lemon { --tile: #fff6d7; --ink: #85641d; --edge: #eaddaa; }
+.game-picker .game-picker-card:hover { transform: translateY(-3px); background: var(--tile); font-size: 1rem; box-shadow: 0 7px 0 var(--edge); }
+.game-picker .game-picker-card:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge); }
+.game-picker .game-picker-card:focus-visible { outline: 3px solid #4257a8; outline-offset: 5px; }
+.game-picker-symbol { display: flex; align-items: center; justify-content: center; height: 46px; width: 46px; border-radius: 14px; background: #ffffffba; color: var(--ink); font: 800 32px/1 system-ui, sans-serif; }
+.game-picker-symbol img { width: 30px; height: 30px; object-fit: contain; }
+.game-picker-copy { min-width: 0; }
+.game-picker-name { display: block; font-size: 1.05rem; line-height: 1.3; font-weight: 800; overflow-wrap: anywhere; }
+.game-picker-description { display: block; font-size: .75rem; font-weight: 400; line-height: 1.4; color: #485568; margin-top: 4px; }
+.game-picker-footer { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid var(--edge); padding-top: 10px; font-size: .7rem; font-weight: 500; color: var(--ink); }
+.game-picker-play { font-size: .8rem; font-weight: 800; }
+.game-picker-play > span { display: inline-flex; align-items: center; justify-content: center; background: white; border-radius: 50%; width: 22px; height: 22px; margin-left: 4px; }
+.is-game-selection > button.back-button { margin: 20px 0 0; padding: 10px 18px; min-height: 44px; background: #eaf0f7; color: #354f6b; font-size: .9rem; box-shadow: none; font-family: inherit; }
+.is-game-selection > button.back-button:hover { transform: translateY(-2px); font-size: .9rem; background: #dce7f4; }
+@media (max-width: 720px) {
+  .game-picker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .game-picker-heading { align-items: flex-start; }
+  .game-picker-course { max-width: 110px; }
+}
+@media (max-width: 430px) {
+  .is-game-selection > .profile-container { grid-template-columns: 52px minmax(0, 1fr) auto; gap: 6px 10px; padding: 10px; margin-bottom: 18px; }
+  .is-game-selection > .profile-container .profile-image { width: 52px; height: 52px; }
+  .is-game-selection > .profile-container .profile-name { font-size: 1rem; }
+  .is-game-selection > .profile-container .evolution-status { font-size: .72rem; }
+  .is-game-selection > .profile-container .profile-score-bubble { padding: 7px; font-size: .7rem; }
+  .game-picker-heading { display: block; margin-bottom: 14px; }
+  .game-picker-course { display: inline-block; max-width: none; padding: 5px 9px; margin-top: 10px; }
+  .game-picker .game-picker-card { grid-template-columns: 1fr; gap: 8px; padding: 12px; border-radius: 16px; }
+  .game-picker-symbol { width: 36px; height: 36px; font-size: 26px; border-radius: 10px; }
+  .game-picker-name { font-size: .95rem; }
+  .game-picker-description { font-size: .7rem; min-height: 2.8em; }
+  .game-picker-footer > span:first-child { display: none; }
+  .game-picker-footer { justify-content: flex-end; padding-top: 7px; }
+}
+@media (prefers-reduced-motion: reduce) { .game-picker .game-picker-card { transition: none; } }

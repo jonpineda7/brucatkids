@@ -91,7 +91,7 @@ function App() {
   };
 
   return (
-    <div className={`app-shell ${selectedGame ? 'is-playing' : ''}`}>
+    <div className={`app-shell ${selectedGame ? 'is-playing' : category && !bonusActive ? 'is-game-selection' : ''}`}>
       {character === null ? (
         <div className="welcome-screen">
           <h1>¡Bienvenidos a BruCat Kids!</h1>
